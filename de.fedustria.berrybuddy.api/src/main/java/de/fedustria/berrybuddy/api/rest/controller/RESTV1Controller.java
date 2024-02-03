@@ -1,13 +1,16 @@
 package de.fedustria.berrybuddy.api.rest.controller;
 
+import de.fedustria.berrybuddy.api.dao.SessionDAO;
 import de.fedustria.berrybuddy.api.dao.UserDAO;
+import de.fedustria.berrybuddy.api.model.Session;
 import de.fedustria.berrybuddy.api.rest.requests.LoginRequest;
 import de.fedustria.berrybuddy.api.rest.requests.RegisterRequest;
 import de.fedustria.berrybuddy.api.rest.response.DefaultResponse;
+import de.fedustria.berrybuddy.api.service.JWTService;
 import de.fedustria.berrybuddy.api.service.UserService;
 import de.fedustria.berrybuddy.api.utils.IniProvider;
-import de.fedustria.berrybuddy.api.utils.JWTGenerator;
 import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,8 +23,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.io.File;
+import java.util.UUID;
 
-import static de.fedustria.berrybuddy.api.utils.Constants.*;
+import static de.fedustria.berrybuddy.api.utils.Constants.CONF_DIR;
+import static de.fedustria.berrybuddy.api.utils.Constants.DB_INI;
 
 @RestController
 public class RESTV1Controller {
@@ -40,12 +45,19 @@ public class RESTV1Controller {
             final var optUser = UserService.getUser(userDAO.fetchAll(), encoder, body.getUsername(), body.getPassword());
 
             if (optUser.isPresent()) {
-                final var jwt = JWTGenerator.generateToken(optUser.get(), 3600, JWT_SECRET);
+                final var user = optUser.get();
+                final var sessionId = UUID.randomUUID().toString();
+
+                final var jwt = JWTService.generateToken(user, sessionId);
                 final var cookie = new Cookie("_auth", jwt);
                 cookie.setPath("/");
-                cookie.setMaxAge(3600);
                 cookie.setSecure(true);
                 response.addCookie(cookie);
+
+                final Session session = new Session(user.getId(), sessionId);
+                final var sessionDAO = new SessionDAO(props.loadProperties());
+                sessionDAO.insert(session);
+
                 return new ResponseEntity<>(new DefaultResponse("Successfully logged in"), HttpStatus.OK);
             }
         } catch (final Exception e) {
@@ -74,12 +86,54 @@ public class RESTV1Controller {
     }
 
     @PostMapping(PREFIX + "/logout")
-    public void logout(@RequestBody final String body) {
+    public ResponseEntity<?> logout(final HttpServletRequest request) {
+        try {
+            final var props = new IniProvider(new File(CONF_DIR, DB_INI));
+            final var sessionDAO = new SessionDAO(props.loadProperties());
 
+            for (final Cookie cookie : request.getCookies()) {
+                if (cookie.getName().equals("_auth")) {
+                    final var tokenOpt = JWTService.decodeToken(cookie.getValue());
+                    if (tokenOpt.isPresent()) {
+                        final var decodedToken = tokenOpt.get();
+                        final var sessionId = decodedToken.getHeaderClaim("sessionId").asString();
+                        sessionDAO.deleteSession(sessionId);
+
+                        return new ResponseEntity<>(new DefaultResponse("Successfully logged out"), HttpStatus.OK);
+                    }
+                }
+            }
+
+            return new ResponseEntity<>(new DefaultResponse("Failed to logout"), HttpStatus.INTERNAL_SERVER_ERROR);
+        } catch (final Exception e) {
+            return new ResponseEntity<>(new DefaultResponse("Failed to logout"), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     @PostMapping(PREFIX + "/validateSession")
-    public void validateSession(@RequestBody final String body) {
+    public ResponseEntity<?> validateSession(final HttpServletRequest request) {
+        try {
+            final var props = new IniProvider(new File(CONF_DIR, DB_INI));
+            final var sessionDAO = new SessionDAO(props.loadProperties());
 
+            for (final Cookie cookie : request.getCookies()) {
+                if (cookie.getName().equals("_auth")) {
+                    final var tokenOpt = JWTService.decodeToken(cookie.getValue());
+                    if (tokenOpt.isPresent()) {
+                        final var decodedToken = tokenOpt.get();
+                        final var userId = decodedToken.getHeaderClaim("userId").asInt();
+                        final var sessionId = decodedToken.getHeaderClaim("sessionId").asString();
+
+                        if (sessionDAO.isValidSessionId(userId, sessionId)) {
+                            return new ResponseEntity<>(new DefaultResponse("Session is valid"), HttpStatus.OK);
+                        }
+                    }
+                }
+            }
+
+            return new ResponseEntity<>(new DefaultResponse("Session is invalid"), HttpStatus.UNAUTHORIZED);
+        } catch (final Exception e) {
+            return new ResponseEntity<>(new DefaultResponse("Session is invalid"), HttpStatus.UNAUTHORIZED);
+        }
     }
 }

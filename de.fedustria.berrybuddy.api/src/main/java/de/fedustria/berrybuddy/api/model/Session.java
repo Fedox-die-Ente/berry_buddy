@@ -4,8 +4,12 @@ import lombok.Getter;
 
 @Getter
 public class Session {
-    private Integer id;
-    private Integer linkedUserId;
-    private long    expiresIn;
-    private String  token;
+    private       Integer id;
+    private final Integer linkedUserId;
+    private final String  sessionId;
+
+    public Session(final Integer linkedUserId, final String sessionId) {
+        this.linkedUserId = linkedUserId;
+        this.sessionId = sessionId;
+    }
 }

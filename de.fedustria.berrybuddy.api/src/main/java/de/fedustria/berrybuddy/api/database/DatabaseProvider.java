@@ -13,4 +13,12 @@ public interface DatabaseProvider {
     void removeUser(User user);
 
     void updateUser(User user);
+
+    boolean isActiveSession(Integer userId, String token) throws SQLException;
+
+    boolean isValidSessionId(Integer userId, String sessionId) throws SQLException;
+
+    void addSession(Integer userId, String sessionId) throws SQLException;
+
+    void removeSession(String sessionId) throws SQLException;
 }

@@ -34,9 +34,17 @@ public class MySQLProvider implements DatabaseProvider {
 
                 try (final var reader = new BufferedReader(new InputStreamReader(stream))) {
                     final var builder = new StringBuilder();
-                    reader.lines().forEach(builder::append);
-                    final var query = connection.prepareStatement(builder.toString());
-                    query.execute();
+                    for (String line; (line = reader.readLine()) != null; ) {
+                        if (!line.isEmpty()) {
+                            builder.append(line);
+
+                            if (line.trim().endsWith(";")) {
+                                final var query = connection.prepareStatement(builder.toString());
+                                query.execute();
+                                builder.setLength(0);
+                            }
+                        }
+                    }
                 }
             }
 
@@ -129,5 +137,62 @@ public class MySQLProvider implements DatabaseProvider {
     @Override
     public void updateUser(final User user) {
 
+    }
+
+    @Override
+    public boolean isActiveSession(final Integer userId, final String token) throws SQLException {
+        preQuery();
+
+        final var query = connection.prepareStatement("SELECT * FROM sessions WHERE user_id = ? AND token = ?");
+        query.setInt(1, userId);
+        query.setString(2, token);
+        final var result = query.executeQuery();
+        if (result.next()) {
+            return true;
+        }
+
+        postQuery();
+
+        return false;
+    }
+
+    @Override
+    public boolean isValidSessionId(final Integer userId, final String sessionId) throws SQLException {
+        preQuery();
+
+        final var query = connection.prepareStatement("SELECT * FROM sessions WHERE user_id = ? AND session_id = ?");
+        query.setInt(1, userId);
+        query.setString(2, sessionId);
+        final var result = query.executeQuery();
+
+        if (result.next()) {
+            return true;
+        }
+
+        postQuery();
+        return false;
+    }
+
+    @Override
+    public void addSession(final Integer userId, final String sessionId) throws SQLException {
+        preQuery();
+
+        final var query = connection.prepareStatement("INSERT INTO sessions (user_id, session_id) VALUES (?, ?)");
+        query.setInt(1, userId);
+        query.setString(2, sessionId);
+        query.execute();
+
+        postQuery();
+    }
+
+    @Override
+    public void removeSession(final String sessionId) throws SQLException {
+        preQuery();
+
+        final var query = connection.prepareStatement("DELETE FROM sessions WHERE session_id = ?");
+        query.setString(1, sessionId);
+        query.execute();
+
+        postQuery();
     }
 }

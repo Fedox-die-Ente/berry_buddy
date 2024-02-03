@@ -14,6 +14,18 @@ public class User {
     private String   avatarURL;
     private int      sessionId;
 
+    public static User create(final Integer id, final String name, final String username, final UserRole role, final String hashedPassword, final String avatarURL, final int sessionId) {
+        final User user = new User();
+        user.id = id;
+        user.name = name;
+        user.username = username;
+        user.role = role;
+        user.hashedPassword = hashedPassword;
+        user.avatarURL = avatarURL;
+        user.sessionId = sessionId;
+        return user;
+    }
+
     public UserDTO toUserDTO() {
         return new UserDTO(id, name, username, role, avatarURL);
     }

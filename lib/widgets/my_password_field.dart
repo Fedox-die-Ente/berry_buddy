@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
-import '../constants.dart';
 
 class MyPasswordField extends StatelessWidget {
 
-  const MyPasswordField({
+  const MyPasswordField({super.key, 
    // Key? key,
     required this.placeholder
   });

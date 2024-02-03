@@ -4,6 +4,8 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../widgets/widget.dart';
 
 class RegisterPagePanel extends StatelessWidget {
+  const RegisterPagePanel({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -65,10 +67,15 @@ class RegisterPagePanel extends StatelessWidget {
                         ),
                       )),
                       const SizedBox(height: 40,),
-                      FadeInUp(duration: const Duration(milliseconds: 1500), child: Text("Forgot Password?", style: GoogleFonts.redHatDisplay(color: Colors.grey),)),
+                      //FadeInUp(duration: const Duration(milliseconds: 1500), child: Text("Forgot Password?", style: GoogleFonts.redHatDisplay(color: Colors.grey),)),
+
+                      const ForgotPasswordWidget(),
+
                       const SizedBox(height: 40,),
                       FadeInUp(duration: const Duration(milliseconds: 1600), child: MaterialButton(
-                        onPressed: () {},
+                        onPressed: () {
+                          print("Implement login");
+                        },
                         height: 50,
                         // margin: EdgeInsets.symmetric(horizontal: 50),
                         color: Colors.purple[900],
@@ -83,7 +90,7 @@ class RegisterPagePanel extends StatelessWidget {
                         ),
                       )),
                       const SizedBox(height: 40,),
-                      FadeInUp(duration: const Duration(milliseconds: 1500), child: Text("Dont have an account? Create one here.", style: GoogleFonts.redHatDisplay(color: Colors.white, fontWeight: FontWeight.bold),))
+                      const CreateOneHereWidget()
                     ],
                   ),
                 ),

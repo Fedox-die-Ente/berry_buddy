@@ -48,4 +48,24 @@ public class IniProvider {
 
         return props;
     }
+
+    public Properties loadPropertiesNoEx() {
+        final Properties props = new Properties();
+        if (!file.exists()) return props;
+
+        try {
+            final Ini ini = new Ini(file);
+            final Preferences prefs = new IniPreferences(ini);
+
+            final var node = prefs.node("settings");
+            final var keys = node.keys();
+            for (final String key : keys) {
+                props.setProperty(key, node.get(key, null));
+            }
+        } catch (final Exception e) {
+            LOG.error("Error loading properties", e);
+        }
+
+        return props;
+    }
 }

@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.io.File;
+import java.util.Properties;
 import java.util.UUID;
 
 import static de.fedustria.berrybuddy.api.utils.Constants.CONF_DIR;
@@ -33,14 +34,14 @@ public class RESTV1Controller {
     private static final Logger          LOG     = LoggerFactory.getLogger(RESTV1Controller.class);
     private static final String          PREFIX  = "/api/v1";
     private final        PasswordEncoder encoder = new BCryptPasswordEncoder();
+    private final        Properties      props   = new IniProvider(new File(CONF_DIR, DB_INI)).loadPropertiesNoEx();
 
     @PostMapping(PREFIX + "/login")
     public ResponseEntity<?> login(@RequestBody final LoginRequest body, final HttpServletResponse response) {
         LOG.info("Login request received for user {}", body.getUsername());
 
         try {
-            final var props = new IniProvider(new File(CONF_DIR, DB_INI));
-            final var userDAO = new UserDAO(props.loadProperties());
+            final var userDAO = new UserDAO(props);
 
             final var optUser = UserService.getUser(userDAO.fetchAll(), encoder, body.getUsername(), body.getPassword());
 
@@ -55,10 +56,10 @@ public class RESTV1Controller {
                 response.addCookie(cookie);
 
                 final Session session = new Session(user.getId(), sessionId);
-                final var sessionDAO = new SessionDAO(props.loadProperties());
+                final var sessionDAO = new SessionDAO(props);
                 sessionDAO.insert(session);
 
-                return new ResponseEntity<>(new DefaultResponse("Successfully logged in"), HttpStatus.OK);
+                return new ResponseEntity<>(user.toUserDTO(), HttpStatus.OK);
             }
         } catch (final Exception e) {
             return new ResponseEntity<>(new DefaultResponse("Failed to check login."), HttpStatus.UNAUTHORIZED);
@@ -72,8 +73,7 @@ public class RESTV1Controller {
         LOG.info("Register request received for user {}", body.getEmailOrPhone());
 
         try {
-            final var props = new IniProvider(new File(CONF_DIR, DB_INI));
-            final var userDAO = new UserDAO(props.loadProperties());
+            final var userDAO = new UserDAO(props);
 
             if (UserService.registerUser(userDAO, encoder, body.getEmailOrPhone(), body.getPassword())) {
                 return new ResponseEntity<>(new DefaultResponse("Successfully registered"), HttpStatus.OK);
@@ -88,8 +88,7 @@ public class RESTV1Controller {
     @PostMapping(PREFIX + "/logout")
     public ResponseEntity<?> logout(final HttpServletRequest request) {
         try {
-            final var props = new IniProvider(new File(CONF_DIR, DB_INI));
-            final var sessionDAO = new SessionDAO(props.loadProperties());
+            final var sessionDAO = new SessionDAO(props);
 
             for (final Cookie cookie : request.getCookies()) {
                 if (cookie.getName().equals("_auth")) {
@@ -113,8 +112,7 @@ public class RESTV1Controller {
     @PostMapping(PREFIX + "/validateSession")
     public ResponseEntity<?> validateSession(final HttpServletRequest request) {
         try {
-            final var props = new IniProvider(new File(CONF_DIR, DB_INI));
-            final var sessionDAO = new SessionDAO(props.loadProperties());
+            final var sessionDAO = new SessionDAO(props);
 
             for (final Cookie cookie : request.getCookies()) {
                 if (cookie.getName().equals("_auth")) {

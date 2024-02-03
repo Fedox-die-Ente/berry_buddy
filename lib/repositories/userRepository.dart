@@ -1,9 +1,20 @@
-class UserRepository {
+import 'dart:convert';
 
+import 'package:http/http.dart' as http;
+
+class UserRepository {
   Future<void> signInWithEmail(String email, String password) async {
-    print(email);
-    print(password);
-    // TODO: Login via the database and return
+    http.Response response =
+        await http.post(Uri.parse('http://localhost:8080/api/v1/login'),
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: jsonEncode({
+              'username': email,
+              'password': password,
+            }));
+
+    print(response.body);
   }
 
   Future<bool> isFirstTime(String userId) async {

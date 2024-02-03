@@ -12,6 +12,8 @@ repositories {
 dependencies {
     compileOnly 'org.projectlombok:lombok:1.18.28'
     annotationProcessor 'org.projectlombok:lombok:1.18.28'
+
+    compileOnly 'com.auth0:java-jwt:4.3.0'
 }
 
 test {

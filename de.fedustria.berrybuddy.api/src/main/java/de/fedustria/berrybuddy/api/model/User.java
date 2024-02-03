@@ -26,6 +26,10 @@ public class User {
         return user;
     }
 
+    public static User create(final String name, final String username, final String hashedPassword) {
+        return create(null, name, username, UserRole.USER, hashedPassword, "", 0);
+    }
+
     public UserDTO toUserDTO() {
         return new UserDTO(id, name, username, role, avatarURL);
     }

@@ -24,17 +24,17 @@ class UserRepository {
     // TODO: Return signOut
   }
 
-  Future<bool?> isSignedIn() async {
+  Future<bool> isSignedIn() async {
     // TODO: Fetch currentUser and check if its != null. (as return)
 
     // For testing purposes
-    return null;
+    return false;
   }
 
-  Future<String?> getUser() async {
+  Future<String> getUser() async {
     // TODO: Get through the currentUser the UID
     // For testing purposes
-    return null;
+    return "";
   }
 
   // Profile Setup

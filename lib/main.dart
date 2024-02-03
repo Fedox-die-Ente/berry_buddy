@@ -1,27 +1,45 @@
+import 'dart:js';
+
+import 'package:berry_buddy/blocs/authentication/authentication_bloc.dart';
+import 'package:berry_buddy/repositories/userRepository.dart';
+import 'package:berry_buddy/ui/pages/home.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
+
+import 'blocs/authentication/authentication_event.dart';
 import 'constants.dart';
-import './screens/screen.dart';
+
+
 
 void main() {
-  runApp(const MyApp());
+  runApp(MyApp());
+
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+
+  final UserRepository _userRepository = UserRepository();
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'BerryBuddy - Login',
+      title: 'Berry Buddy',
       theme: ThemeData(
         textTheme: GoogleFonts.poppinsTextTheme(Theme.of(context).textTheme),
         scaffoldBackgroundColor: kBackgroundColor,
         primarySwatch: Colors.deepPurple,
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      home: const RegisterPagePanel(),
+      home: BlocProvider(
+        create: (blocContext) {
+          AuthenticationBloc authenticationBloc = AuthenticationBloc(userRepository: _userRepository);
+          authenticationBloc.add(AppStarted());
+          return authenticationBloc;
+        },
+        child: Home(userRepository: _userRepository),
+      ),
     );
   }
 }

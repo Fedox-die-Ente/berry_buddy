@@ -1,6 +1,7 @@
 import 'package:animate_do/animate_do.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../../widgets/widget.dart';
 
 class RegisterPagePanel extends StatelessWidget {
   @override
@@ -55,36 +56,11 @@ class RegisterPagePanel extends StatelessWidget {
                                 offset: Offset(0, 10)
                             )]
                         ),
-                        child: Column(
+                        child: const Column(
                           children: <Widget>[
-                            Container(
-                              padding: const EdgeInsets.all(10),
-                              decoration: BoxDecoration(
-                                  border: Border(bottom: BorderSide(color: Colors.deepPurpleAccent.shade200))
-                              ),
-                              child: const TextField(
-                                decoration: InputDecoration(
-                                    hintText: "Email or Phone number",
-                                    hintStyle: TextStyle(color: Colors.grey),
-                                    border: InputBorder.none
-                                ),
-                              ),
-                            ),
-                            Container(
-                              padding: const EdgeInsets.all(10),
-                              decoration: BoxDecoration(
-                                  border: Border(bottom: BorderSide(color: Colors.deepPurpleAccent.shade200))
-                              ),
-                              child: const TextField(
-                                obscureText: true,
-                                decoration: InputDecoration(
-                                    hintText: "Password",
-                                    hintStyle: TextStyle(color: Colors.grey),
-                                    fillColor: Colors.blueAccent,
-                                    border: InputBorder.none
-                                ),
-                              ),
-                            ),
+                            MyTextInput(placeholder: "Email or Phone number"),
+
+                            MyPasswordField(placeholder: "Password"),
                           ],
                         ),
                       )),

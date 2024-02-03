@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 
+// Vars
+const devTeam = "Fedustria Studios";
+const devTeamFounders = ["Fedox", "Austria"];
+
 // Colors
 const kBackgroundColor = Color(0xff191720);
 const kTextFieldFill = Color(0xff1E1C24);

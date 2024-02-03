@@ -5,11 +5,11 @@ import lombok.Getter;
 
 @Getter
 public class UserDTO {
-    private Integer  id;
-    private String   name;
-    private String   username;
-    private UserRole role;
-    private String   avatarURL;
+    private final Integer id;
+    private final String  name;
+    private final String  username;
+    private final UserRole role;
+    private final String   avatarURL;
 
     public UserDTO(final Integer id, final String name, final String username, final UserRole role, final String avatarURL) {
         this.id = id;
@@ -18,6 +18,4 @@ public class UserDTO {
         this.role = role;
         this.avatarURL = avatarURL;
     }
-
-    public UserDTO() {}
 }

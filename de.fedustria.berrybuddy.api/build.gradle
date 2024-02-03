@@ -25,9 +25,15 @@ dependencies {
     compileOnly 'org.projectlombok:lombok:1.18.28'
     annotationProcessor 'org.projectlombok:lombok:1.18.28'
 
-    compileOnly 'com.auth0:java-jwt:4.3.0'
-
+    implementation 'com.auth0:java-jwt:4.3.0'
     implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.security:spring-security-crypto:5.8.9'
+    implementation 'org.ini4j:ini4j:0.5.4'
+
+    // database
+    implementation 'org.springframework:spring-jdbc:5.3.13'
+    implementation 'mysql:mysql-connector-java:8.0.33'
+
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }
 

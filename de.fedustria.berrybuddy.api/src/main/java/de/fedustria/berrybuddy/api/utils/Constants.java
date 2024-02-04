@@ -21,7 +21,7 @@ public class Constants {
     public static final String MAIL_HOST     = "host";
     public static final String MAIL_PORT     = "port";
     public static final String MAIL_USER     = "user";
-    public static final String MAIL_PASS     = "pass";
+    public static final String MAIL_PASS     = "password";
     public static final String MAIL_PROTOCOL = "protocol";
     public static final String MAIL_AUTH     = "auth";
     public static final String MAIL_STARTTLS = "starttls";

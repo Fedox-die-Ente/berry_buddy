@@ -4,18 +4,17 @@ import 'package:berry_buddy/repositories/userRepository.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../../ui/pages/register.dart';
+import '../../screens/login/login.dart';
 import '../../widgets/widget.dart';
 
-class Login extends StatelessWidget {
+class Register extends StatelessWidget {
   final UserRepository _userRepository;
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
 
 
-  Login({required UserRepository userRepository})
-  : assert(userRepository != null),
-  _userRepository = userRepository;
+  Register({required UserRepository userRepository})
+      : _userRepository = userRepository;
 
 
 
@@ -29,17 +28,17 @@ class Login extends StatelessWidget {
           builder: (context, state) {
             // Use the state to build your UI
             return Container(
-                width: double.infinity,
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topCenter,
-                    colors: [
-                      Colors.deepPurple.shade900,
-                      Colors.deepPurple.shade800,
-                      Colors.deepPurple.shade400
-                    ],
-                  ),
+              width: double.infinity,
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  colors: [
+                    Colors.deepPurple.shade900,
+                    Colors.deepPurple.shade800,
+                    Colors.deepPurple.shade400
+                  ],
                 ),
+              ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
@@ -49,9 +48,9 @@ class Login extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: <Widget>[
-                        FadeInUp(duration: const Duration(milliseconds: 1000), child: Text("Login", style: GoogleFonts.redHatDisplay(color: Colors.white, fontSize: 40, fontWeight: FontWeight.bold))),
+                        FadeInUp(duration: const Duration(milliseconds: 1000), child: Text("Register", style: GoogleFonts.redHatDisplay(color: Colors.white, fontSize: 40, fontWeight: FontWeight.bold))),
                         const SizedBox(height: 10),
-                        FadeInUp(duration: const Duration(milliseconds: 1300), child: Text("Welcome back on BerryBuddy.", style: GoogleFonts.redHatDisplay(color: Colors.white, fontSize: 18))),
+                        FadeInUp(duration: const Duration(milliseconds: 1300), child: Text("Thanks for choosing BerryBuddy.", style: GoogleFonts.redHatDisplay(color: Colors.white, fontSize: 18))),
                       ],
                     ),
                   ),
@@ -79,43 +78,41 @@ class Login extends StatelessWidget {
                               ),
                               child: Column(
                                 children: <Widget>[
-                                Container(
-                                padding: const EdgeInsets.all(10),
-                                decoration: BoxDecoration(
-                                    border: Border(bottom: BorderSide(color: Colors.deepPurpleAccent.shade200))
-                                ),
-                                child: TextField(
-                                  controller: emailController,
-                                  decoration: const InputDecoration(
-                                      hintText: "Email or phone number",
-                                      hintStyle: TextStyle(color: Colors.grey),
-                                      border: InputBorder.none
+                                  Container(
+                                    padding: const EdgeInsets.all(10),
+                                    decoration: BoxDecoration(
+                                        border: Border(bottom: BorderSide(color: Colors.deepPurpleAccent.shade200))
+                                    ),
+                                    child: TextField(
+                                      controller: emailController,
+                                      decoration: const InputDecoration(
+                                          hintText: "Email or phone number",
+                                          hintStyle: TextStyle(color: Colors.grey),
+                                          border: InputBorder.none
+                                      ),
+                                    ),
                                   ),
-                                ),
-                              ),
 
-                              Container(
-                                padding: const EdgeInsets.all(10),
-                                decoration: const BoxDecoration(
-                                  //border: Border(bottom: BorderSide(color: Colors.grey.shade200))
-                                ),
-                                child: TextField(
-                                  controller: passwordController,
-                                  obscureText: true,
-                                  decoration: const InputDecoration(
-                                      hintText: "Password",
-                                      hintStyle: TextStyle(color: Colors.grey),
-                                      border: InputBorder.none
+                                  Container(
+                                    padding: const EdgeInsets.all(10),
+                                    decoration: const BoxDecoration(
+                                      //border: Border(bottom: BorderSide(color: Colors.grey.shade200))
+                                    ),
+                                    child: TextField(
+                                      controller: passwordController,
+                                      obscureText: true,
+                                      decoration: const InputDecoration(
+                                          hintText: "Password",
+                                          hintStyle: TextStyle(color: Colors.grey),
+                                          border: InputBorder.none
+                                      ),
+                                    ),
                                   ),
-                                ),
-                              ),
                                 ],
                               ),
                             )),
                             const SizedBox(height: 40,),
                             //FadeInUp(duration: const Duration(milliseconds: 1500), child: Text("Forgot Password?", style: GoogleFonts.redHatDisplay(color: Colors.grey),)),
-
-                            const ForgotPasswordWidget(),
 
                             const SizedBox(height: 40,),
                             FadeInUp(duration: const Duration(milliseconds: 1600), child: MaterialButton(
@@ -154,11 +151,10 @@ class Login extends StatelessWidget {
                               // decoration: BoxDecoration(
                               // ),
                               child: Center(
-                                child: Text("Login", style: GoogleFonts.redHatDisplay(color: Colors.white, fontWeight: FontWeight.bold),),
+                                child: Text("Register", style: GoogleFonts.redHatDisplay(color: Colors.white, fontWeight: FontWeight.bold),),
                               ),
                             )),
                             const SizedBox(height: 40,),
-
                             InkWell(
                                 onTap: () {
                                   Navigator.push(
@@ -166,7 +162,7 @@ class Login extends StatelessWidget {
                                     PageRouteBuilder(
                                       pageBuilder: (context, animation, secondaryAnimation) => FadeTransition(
                                         opacity: animation,
-                                        child: Register(userRepository: _userRepository),
+                                        child: Login(userRepository: _userRepository),
                                       ),
                                       transitionsBuilder: (context, animation, secondaryAnimation, child) {
                                         const begin = Offset(0.0, 1.0);
@@ -183,7 +179,7 @@ class Login extends StatelessWidget {
                                 },
                                 child: FadeInUp(
                                     duration: const Duration(milliseconds: 1500),
-                                    child: Text("Dont have an account? Create one here.",
+                                    child: Text("Already have one? Log in here.",
                                         style: GoogleFonts.redHatDisplay(color: Colors.white, fontWeight: FontWeight.bold)
                                     )
                                 )

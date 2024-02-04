@@ -17,7 +17,7 @@ public class SessionDAO implements DAO<Session> {
     @Override
     public void insert(final Session session) {
         try {
-            mySQLProvider.addSession(session.getLinkedUserId(), session.getSessionId());
+            mySQLProvider.addSession(session.getLinkedUserId(), session.getSessionId(), session.getSessionIP(), session.getSessionDevice());
         } catch (final SQLException e) {
             e.printStackTrace();
         }

@@ -18,7 +18,7 @@ public interface DatabaseProvider {
 
     boolean isValidSessionId(Integer userId, String sessionId) throws SQLException;
 
-    void addSession(Integer userId, String sessionId) throws SQLException;
+    void addSession(Integer userId, String sessionId, final String sessionIP, final String sessionDevice) throws SQLException;
 
     void removeSession(String sessionId) throws SQLException;
 }

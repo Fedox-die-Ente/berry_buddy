@@ -13,5 +13,7 @@ CREATE TABLE IF NOT EXISTS `users` (
 CREATE TABLE IF NOT EXISTS `sessions` (
   `id` INT AUTO_INCREMENT PRIMARY KEY,
   `user_id` INT NOT NULL,
-  `session_id` TEXT NOT NULL
+  `session_id` TEXT NOT NULL,
+  `session_ip` VARCHAR(100) NOT NULL,
+  `session_device` VARCHAR(100) NOT NULL
 );

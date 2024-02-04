@@ -1,3 +1,6 @@
+import 'dart:io';
+
+import 'package:geolocator/geolocator.dart';
 class UserRepository {
 
   Future<void> signInWithEmail(String email, String password) async {
@@ -38,7 +41,14 @@ class UserRepository {
   }
 
   // Profile Setup
-  Future<void> profileSetup() async {
-    // TODO: Create user
+  Future<void> profileSetup(
+      File photo,
+      String userId,
+      String name,
+      String gender,
+      String interestedIn,
+      DateTime age,
+      Geolocator location) async {
+    // TODO: Store in database
   }
 }

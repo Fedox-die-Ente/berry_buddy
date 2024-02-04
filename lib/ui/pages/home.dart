@@ -1,4 +1,5 @@
 import 'package:animate_do/animate_do.dart';
+import 'package:berry_buddy/ui/pages/register.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -77,25 +78,25 @@ class Home extends StatelessWidget {
                     duration: const Duration(milliseconds: 1600),
                     child: MaterialButton(
                       onPressed: () {
-                        // Navigator.push(
-                        //   context,
-                        //   PageRouteBuilder(
-                        //     pageBuilder: (context, animation, secondaryAnimation) => FadeTransition(
-                        //       opacity: animation,
-                        //       child: SignUp(userRepository: _userRepository),
-                        //     ),
-                        //     transitionsBuilder: (context, animation, secondaryAnimation, child) {
-                        //       const begin = Offset(0.0, 1.0);
-                        //       const end = Offset.zero;
-                        //       const curve = Curves.easeInOut;
-                        //       var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
-                        //
-                        //       var offsetAnimation = animation.drive(tween);
-                        //
-                        //       return SlideTransition(position: offsetAnimation, child: child);
-                        //     },
-                        //   ),
-                        // );
+                        Navigator.push(
+                          context,
+                          PageRouteBuilder(
+                            pageBuilder: (context, animation, secondaryAnimation) => FadeTransition(
+                              opacity: animation,
+                              child: Register(userRepository: _userRepository),
+                            ),
+                            transitionsBuilder: (context, animation, secondaryAnimation, child) {
+                              const begin = Offset(0.0, 1.0);
+                              const end = Offset.zero;
+                              const curve = Curves.easeInOut;
+                              var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+
+                              var offsetAnimation = animation.drive(tween);
+
+                              return SlideTransition(position: offsetAnimation, child: child);
+                            },
+                          ),
+                        );
                       },
 
                       height: 50,

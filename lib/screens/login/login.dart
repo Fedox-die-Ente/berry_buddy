@@ -4,6 +4,7 @@ import 'package:berry_buddy/repositories/userRepository.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../../ui/pages/register.dart';
 import '../../widgets/widget.dart';
 
 class Login extends StatelessWidget {
@@ -157,7 +158,36 @@ class Login extends StatelessWidget {
                               ),
                             )),
                             const SizedBox(height: 40,),
-                            const CreateOneHereWidget()
+
+                            InkWell(
+                                onTap: () {
+                                  Navigator.push(
+                                    context,
+                                    PageRouteBuilder(
+                                      pageBuilder: (context, animation, secondaryAnimation) => FadeTransition(
+                                        opacity: animation,
+                                        child: Register(userRepository: _userRepository),
+                                      ),
+                                      transitionsBuilder: (context, animation, secondaryAnimation, child) {
+                                        const begin = Offset(0.0, 1.0);
+                                        const end = Offset.zero;
+                                        const curve = Curves.easeInOut;
+                                        var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+
+                                        var offsetAnimation = animation.drive(tween);
+
+                                        return SlideTransition(position: offsetAnimation, child: child);
+                                      },
+                                    ),
+                                  );
+                                },
+                                child: FadeInUp(
+                                    duration: const Duration(milliseconds: 1500),
+                                    child: Text("Dont have an account? Create one here.",
+                                        style: GoogleFonts.redHatDisplay(color: Colors.white, fontWeight: FontWeight.bold)
+                                    )
+                                )
+                            )
                           ],
                         ),
                       ),

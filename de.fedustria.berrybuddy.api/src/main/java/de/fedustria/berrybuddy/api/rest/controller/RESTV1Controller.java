@@ -30,6 +30,7 @@ import java.util.UUID;
 
 import static de.fedustria.berrybuddy.api.utils.Constants.CONF_DIR;
 import static de.fedustria.berrybuddy.api.utils.Constants.DB_INI;
+import static de.fedustria.berrybuddy.api.utils.StringUtils.isEmpty;
 
 @RestController
 public class RESTV1Controller {
@@ -73,7 +74,10 @@ public class RESTV1Controller {
         try {
             final var userDAO = new UserDAO(props);
 
-            if (UserService.registerUser(userDAO, encoder, body.getEmailOrPhone(), body.getPassword())) {
+            final var email = body.getEmailOrPhone();
+            final var password = body.getPassword();
+
+            if (!isEmpty(email, password) && UserService.registerUser(userDAO, encoder, email, password)) {
                 return new ResponseEntity<>(new DefaultResponse("Successfully registered"), HttpStatus.OK);
             }
         } catch (final Exception e) {

@@ -4,7 +4,6 @@ import 'package:google_fonts/google_fonts.dart';
 
 import '../../repositories/userRepository.dart';
 import '../../screens/login/login.dart';
-import 'register.dart';
 
 class Home extends StatelessWidget {
 
@@ -78,12 +77,25 @@ class Home extends StatelessWidget {
                     duration: const Duration(milliseconds: 1600),
                     child: MaterialButton(
                       onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => Register(userRepository: _userRepository),
-                          ),
-                        );
+                        // Navigator.push(
+                        //   context,
+                        //   PageRouteBuilder(
+                        //     pageBuilder: (context, animation, secondaryAnimation) => FadeTransition(
+                        //       opacity: animation,
+                        //       child: SignUp(userRepository: _userRepository),
+                        //     ),
+                        //     transitionsBuilder: (context, animation, secondaryAnimation, child) {
+                        //       const begin = Offset(0.0, 1.0);
+                        //       const end = Offset.zero;
+                        //       const curve = Curves.easeInOut;
+                        //       var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+                        //
+                        //       var offsetAnimation = animation.drive(tween);
+                        //
+                        //       return SlideTransition(position: offsetAnimation, child: child);
+                        //     },
+                        //   ),
+                        // );
                       },
 
                       height: 50,

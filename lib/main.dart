@@ -9,10 +9,14 @@ import 'package:google_fonts/google_fonts.dart';
 
 import 'blocs/authentication/authentication_event.dart';
 import 'constants.dart';
+import 'utils/notify.dart';
 
 
+Future<void> main() async {
 
-void main() {
+  NotificationHandler notificationHandler = NotificationHandler();
+  await notificationHandler.init();
+
   runApp(MyApp());
 
 }

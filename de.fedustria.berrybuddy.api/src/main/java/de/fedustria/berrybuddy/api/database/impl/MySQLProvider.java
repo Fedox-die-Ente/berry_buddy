@@ -68,7 +68,7 @@ public class MySQLProvider implements DatabaseProvider {
                 properties.getProperty(DB_PORT, ""),
                 properties.getProperty(DB_DATABASE, "")
         );
-        
+
         try {
             connection = DriverManager.getConnection(url);
             if (connection == null) {
@@ -100,7 +100,7 @@ public class MySQLProvider implements DatabaseProvider {
                     result.getInt("id"),
                     result.getString("name"),
                     result.getString("username"),
-                    UserRole.OWNER,
+                    UserRole.valueOf(result.getString("role")),
                     result.getString("password"),
                     result.getString("avatar_url"),
                     result.getInt("session_id")

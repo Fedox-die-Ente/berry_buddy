@@ -92,16 +92,16 @@ public class RESTV1Controller {
         try {
             final var sessionDAO = new SessionDAO(props);
 
-            for (final Cookie cookie : request.getCookies()) {
-                if (cookie.getName().equals("_auth")) {
-                    final var tokenOpt = JWTService.decodeToken(cookie.getValue());
-                    if (tokenOpt.isPresent()) {
-                        final var decodedToken = tokenOpt.get();
-                        final var sessionId = decodedToken.getHeaderClaim("sessionId").asString();
-                        sessionDAO.deleteSession(sessionId);
+            final var optCookie = HttpUtils.getCookie(request, "_auth");
+            if (optCookie.isPresent()) {
+                final var cookie = optCookie.get();
+                final var tokenOpt = JWTService.decodeToken(cookie.getValue());
+                if (tokenOpt.isPresent()) {
+                    final var decodedToken = tokenOpt.get();
+                    final var sessionId = decodedToken.getHeaderClaim("sessionId").asString();
+                    sessionDAO.deleteSession(sessionId);
 
-                        return new ResponseEntity<>(new DefaultResponse("Successfully logged out"), HttpStatus.OK);
-                    }
+                    return new ResponseEntity<>(new DefaultResponse("Successfully logged out"), HttpStatus.OK);
                 }
             }
 

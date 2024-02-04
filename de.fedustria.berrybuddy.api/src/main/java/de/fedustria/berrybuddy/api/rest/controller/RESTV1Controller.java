@@ -40,8 +40,6 @@ public class RESTV1Controller {
 
     @PostMapping(PREFIX + "/login")
     public ResponseEntity<?> login(@RequestBody final LoginRequest body, final HttpServletResponse response, final HttpServletRequest request) {
-        LOG.info("Login request received for user {}", body.getUsername());
-
         try {
             final var userDAO = new UserDAO(props);
 
@@ -72,8 +70,6 @@ public class RESTV1Controller {
 
     @PostMapping(PREFIX + "/register")
     public ResponseEntity<?> register(@RequestBody final RegisterRequest body) {
-        LOG.info("Register request received for user {}", body.getEmailOrPhone());
-
         try {
             final var userDAO = new UserDAO(props);
 

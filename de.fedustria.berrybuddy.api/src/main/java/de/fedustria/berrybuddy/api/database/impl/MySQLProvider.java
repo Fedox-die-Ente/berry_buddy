@@ -68,9 +68,7 @@ public class MySQLProvider implements DatabaseProvider {
                 properties.getProperty(DB_PORT, ""),
                 properties.getProperty(DB_DATABASE, "")
         );
-
-        LOG.info("URL: {}", url);
-
+        
         try {
             connection = DriverManager.getConnection(url);
             if (connection == null) {
@@ -98,8 +96,6 @@ public class MySQLProvider implements DatabaseProvider {
         final var query = connection.prepareStatement("SELECT * FROM users");
         final var result = query.executeQuery();
         while (result.next()) {
-            LOG.info("User: {}", result.getString("username"));
-
             final var user = User.create(
                     result.getInt("id"),
                     result.getString("name"),

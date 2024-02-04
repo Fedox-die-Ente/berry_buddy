@@ -15,6 +15,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
+import static de.fedustria.berrybuddy.api.utils.Constants.*;
+
 public class MySQLProvider implements DatabaseProvider {
     private static final Logger     LOG = LoggerFactory.getLogger(MySQLProvider.class);
     private final        Properties properties;
@@ -59,11 +61,11 @@ public class MySQLProvider implements DatabaseProvider {
 
         url = String.format(
                 url,
-                properties.getProperty("user", ""),
-                properties.getProperty("password", ""),
-                properties.getProperty("host", ""),
-                properties.getProperty("port", ""),
-                properties.getProperty("database", "")
+                properties.getProperty(DB_USER, ""),
+                properties.getProperty(DB_PASSWORD, ""),
+                properties.getProperty(DB_HOST, ""),
+                properties.getProperty(DB_PORT, ""),
+                properties.getProperty(DB_DATABASE, "")
         );
 
         LOG.info("URL: {}", url);

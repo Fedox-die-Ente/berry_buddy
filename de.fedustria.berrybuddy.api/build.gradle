@@ -26,9 +26,12 @@ dependencies {
     annotationProcessor 'org.projectlombok:lombok:1.18.28'
 
     implementation 'com.auth0:java-jwt:4.3.0'
-    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-web:3.1.2'
     implementation 'org.springframework.security:spring-security-crypto:5.8.9'
     implementation 'org.ini4j:ini4j:0.5.4'
+
+    // mail
+    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-mail', version: '3.1.2'
 
     // database
     implementation 'org.springframework:spring-jdbc:5.3.13'

@@ -37,7 +37,7 @@ public class RESTV1Controller {
     private final        Properties      props   = new IniProvider(new File(CONF_DIR, DB_INI)).loadPropertiesNoEx();
 
     @PostMapping(PREFIX + "/login")
-    public ResponseEntity<?> login(@RequestBody final LoginRequest body, final HttpServletResponse response) {
+    public ResponseEntity<?> login(@RequestBody final LoginRequest body, final HttpServletResponse response, final HttpServletRequest request) {
         LOG.info("Login request received for user {}", body.getUsername());
 
         try {
@@ -55,7 +55,7 @@ public class RESTV1Controller {
                 cookie.setSecure(true);
                 response.addCookie(cookie);
 
-                final Session session = new Session(user.getId(), sessionId);
+                final Session session = new Session(user.getId(), sessionId, request.getRemoteAddr(), request.getHeader("User-Agent"));
                 final var sessionDAO = new SessionDAO(props);
                 sessionDAO.insert(session);
 

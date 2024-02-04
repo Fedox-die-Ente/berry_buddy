@@ -174,12 +174,14 @@ public class MySQLProvider implements DatabaseProvider {
     }
 
     @Override
-    public void addSession(final Integer userId, final String sessionId) throws SQLException {
+    public void addSession(final Integer userId, final String sessionId, final String sessionIP, final String sessionDevice) throws SQLException {
         preQuery();
 
-        final var query = connection.prepareStatement("INSERT INTO sessions (user_id, session_id) VALUES (?, ?)");
+        final var query = connection.prepareStatement("INSERT INTO sessions (user_id, session_id, session_ip, session_device) VALUES (?, ?, ?, ?)");
         query.setInt(1, userId);
         query.setString(2, sessionId);
+        query.setString(3, sessionIP);
+        query.setString(4, sessionDevice);
         query.execute();
 
         postQuery();

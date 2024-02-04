@@ -4,6 +4,7 @@ public class Constants {
     // Config
     public static final String CONF_DIR = "conf";
     public static final String DB_INI   = "db.ini";
+    public static final String MAIL_INI = "mail.ini";
 
     // JWT
     public static final String JWT_SECRET = "uthjg7i86u568t423wwgt4w=346534646§%";

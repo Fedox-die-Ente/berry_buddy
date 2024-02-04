@@ -11,7 +11,7 @@ public interface DatabaseProvider {
 
     void addUser(User user) throws SQLException;
 
-    void removeUser(User user);
+    void removeUser(User user) throws SQLException;
 
     void updateUser(User user);
 

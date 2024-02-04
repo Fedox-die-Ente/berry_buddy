@@ -129,8 +129,15 @@ public class MySQLProvider implements DatabaseProvider {
     }
 
     @Override
-    public void removeUser(final User user) {
+    public void removeUser(final User user) throws SQLException {
+        preQuery();
 
+        final var userId = user.getId();
+        final var query = connection.prepareStatement("DELETE FROM users WHERE id = ?");
+        query.setInt(1, userId);
+        query.execute();
+
+        postQuery();
     }
 
     @Override

@@ -1,6 +1,8 @@
 import 'dart:io';
 
 import 'package:geolocator/geolocator.dart';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 class UserRepository {
 
   Future<void> signInWithEmail(String email, String password) async {

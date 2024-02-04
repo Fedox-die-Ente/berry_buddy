@@ -2,6 +2,7 @@ package de.fedustria.berrybuddy.api.database.impl;
 
 import de.fedustria.berrybuddy.api.data.user.UserRole;
 import de.fedustria.berrybuddy.api.database.DatabaseProvider;
+import de.fedustria.berrybuddy.api.model.Session;
 import de.fedustria.berrybuddy.api.model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -139,6 +140,31 @@ public class MySQLProvider implements DatabaseProvider {
     @Override
     public void updateUser(final User user) {
 
+    }
+
+    @Override
+    public List<Session> getSessions(final Integer userId) throws SQLException {
+        final List<Session> list = new ArrayList<>();
+
+        preQuery();
+
+        final var query = connection.prepareStatement("SELECT * FROM sessions WHERE user_id = ?");
+        query.setInt(1, userId);
+        final var result = query.executeQuery();
+
+        while (result.next()) {
+            list.add(new Session(
+                    result.getInt("user_id"),
+                    result.getString("session_id"),
+                    result.getInt("id"),
+                    result.getString("session_ip"),
+                    result.getString("session_device")
+            ));
+        }
+
+        postQuery();
+
+        return list;
     }
 
     @Override

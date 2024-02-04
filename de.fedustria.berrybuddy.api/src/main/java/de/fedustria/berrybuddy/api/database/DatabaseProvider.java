@@ -1,5 +1,6 @@
 package de.fedustria.berrybuddy.api.database;
 
+import de.fedustria.berrybuddy.api.model.Session;
 import de.fedustria.berrybuddy.api.model.User;
 
 import java.sql.SQLException;
@@ -17,6 +18,8 @@ public interface DatabaseProvider {
     boolean isActiveSession(Integer userId, String token) throws SQLException;
 
     boolean isValidSessionId(Integer userId, String sessionId) throws SQLException;
+
+    List<Session> getSessions(Integer userId) throws SQLException;
 
     void addSession(Integer userId, String sessionId, final String sessionIP, final String sessionDevice) throws SQLException;
 

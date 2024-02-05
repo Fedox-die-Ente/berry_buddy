@@ -5,7 +5,7 @@ const devTeam = "Fedustria Studios";
 const devTeamFounders = ["Fedox", "Austria"];
 
 // Colors
-const kBackgroundColor = Color(0xff191720);
+const kBackgroundColor = Color(0xff211e2a);
 const kTextFieldFill = Color(0xff1E1C24);
 // TextStyles
 const kHeadline = TextStyle(

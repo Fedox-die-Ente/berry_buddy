@@ -12,7 +12,7 @@ abstract class SignUpEvent extends Equatable {
 class EmailChanged extends SignUpEvent {
   final String email;
 
-  EmailChanged({required this.email});
+  const EmailChanged({required this.email});
 
   @override
   List<Object> get props => [email];
@@ -24,7 +24,7 @@ class EmailChanged extends SignUpEvent {
 class PasswordChanged extends SignUpEvent {
   final String password;
 
-  PasswordChanged({required this.password});
+  const PasswordChanged({required this.password});
 
   @override
   List<Object> get props => [password];
@@ -34,20 +34,20 @@ class PasswordChanged extends SignUpEvent {
 }
 
 class Submitted extends SignUpEvent {
-  final String? email;
-  final String? password;
+  final String email;
+  final String password;
 
-  Submitted({this.email, this.password});
+  const Submitted({required this.email, required this.password});
 
   @override
-  List<Object> get props => [email!, password!];
+  List<Object> get props => [email, password];
 }
 
 class SignUpWithCredentialsPressed extends SignUpEvent {
   final String email;
   final String password;
 
-  SignUpWithCredentialsPressed({required this.email, required this.password});
+  const SignUpWithCredentialsPressed({required this.email, required this.password});
 
   @override
   List<Object> get props => [email, password];

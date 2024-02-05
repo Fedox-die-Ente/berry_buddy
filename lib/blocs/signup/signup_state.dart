@@ -59,25 +59,26 @@ class SignUpState {
   }
 
   SignUpState update({
-    bool? isEmailValid,
-    bool? isPasswordValid,
+    required bool isEmailValid,
+    required bool isPasswordValid,
   }) {
     return copyWith(
-      isEmailValid: isEmailValid!,
-      isPasswordValid: isPasswordValid!,
+      isEmailValid: isEmailValid,
+      isPasswordValid: isPasswordValid,
       isSubmitting: false,
       isFailure: false,
       isSuccess: false,
+      isSubmitEnabled: false,
     );
   }
 
   SignUpState copyWith({
-    bool? isEmailValid,
-    bool? isPasswordValid,
-    bool? isSubmitEnabled,
-    bool? isSubmitting,
-    bool? isSuccess,
-    bool? isFailure,
+    required bool isEmailValid,
+    required bool isPasswordValid,
+    required bool isSubmitEnabled,
+    required bool isSubmitting,
+    required bool isSuccess,
+    required bool isFailure,
   }) {
     return SignUpState(
         isEmailValid: isEmailValid ?? this.isEmailValid,

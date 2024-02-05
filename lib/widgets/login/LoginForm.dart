@@ -32,7 +32,6 @@ class _LoginFormState extends State<LoginForm> {
       _emailController.text.isNotEmpty && _passwordController.text.isNotEmpty;
 
   bool isLoginButtonEnabled(LoginState state) {
-    print(isPopulated);
     return isPopulated && !state.isSubmitting;
   }
 
@@ -95,7 +94,6 @@ class _LoginFormState extends State<LoginForm> {
           }
 
           if (state.isSubmitting) {
-            print("isSubmitting");
             Scaffold.of(context);
             ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(
@@ -111,7 +109,6 @@ class _LoginFormState extends State<LoginForm> {
           }
 
           if (state.isSuccess) {
-            print("Success");
             BlocProvider.of<AuthenticationBloc>(context).add(LoggedIn());
           }
         },

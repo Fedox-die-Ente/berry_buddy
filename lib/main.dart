@@ -1,6 +1,7 @@
 import 'package:berry_buddy/blocs/authentication/authentication_bloc.dart';
 import 'package:berry_buddy/blocs/authentication/authentication_state.dart';
 import 'package:berry_buddy/repositories/userRepository.dart';
+import 'package:berry_buddy/ui/pages/firstprofile.dart';
 import 'package:berry_buddy/ui/pages/home.dart';
 import 'package:berry_buddy/ui/pages/login.dart';
 import 'package:berry_buddy/ui/pages/splash.dart';
@@ -63,9 +64,10 @@ class MyApp extends StatelessWidget {
             );
           }
           if (state is AuthenticatedButNotSet) {
-            // Signed up but not finished setup
-            print("go to profile setup");
-
+            return ProfileSetup(
+              userRepository: _userRepository,
+              userId: state.userId,
+            );
           }
           if(state is Unauthenticated) {
             return Home(userRepository: _userRepository);

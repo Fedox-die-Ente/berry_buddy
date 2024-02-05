@@ -49,6 +49,8 @@ dependencies:
   geolocator: ^10.1.0
   sms_otp_auto_verify: ^2.1.0
   image_picker: ^1.0.7
+  file_picker: ^6.1.1
+  font_awesome_flutter: ^10.7.0
 
 dev_dependencies:
   flutter_test:
@@ -72,7 +74,7 @@ flutter:
   # the material Icons class.
   uses-material-design: true
   assets:
-    - assets/
+    - assets/profilephoto.png
 
   # To add assets to your application, add an assets section, like this:
   # assets:

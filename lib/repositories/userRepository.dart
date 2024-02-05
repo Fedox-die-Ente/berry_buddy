@@ -15,14 +15,17 @@ class UserRepository {
               'username': email,
               'password': password,
             }));
-    print(response.statusCode == 200);
+    print(response.body);
     return response.statusCode == 200;
   }
 
   Future<bool> isFirstTime(String userId) async {
     bool? exists;
-    // TODO: Check if user already exists in the database.
-    exists = true;
+
+    http.Response response =
+      await http.get(Uri.parse("http://localhost:8080/api/v2/user/$userId"));
+
+    exists = response.statusCode == 200;
 
     return exists;
   }

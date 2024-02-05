@@ -1,5 +1,5 @@
+import 'dart:convert';
 import 'dart:io';
-import 'dart:typed_data';
 
 import 'package:berry_buddy/constants.dart';
 import 'package:flutter/material.dart';
@@ -8,6 +8,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:path_provider/path_provider.dart' as prov;
 import '../blocs/authentication/authentication_bloc.dart';
 import '../blocs/authentication/authentication_event.dart';
 import '../blocs/profile/profile_bloc.dart';
@@ -150,11 +151,19 @@ class _ProfileFormState extends State<ProfileForm> {
                               // }
                               FilePickerResult? result = await FilePicker.platform.pickFiles(type: FileType.image);
                               if (result != null) {
+                                Uint8List? uploadfile = result.files.single.bytes;
+                                Uint8List? imageInUnit8List = uploadfile;
+                              //  final tempDir = await getTemporaryDirectory();
+                                final tempDir = prov.getTemporaryDirectory();
+                                File file = await File('$tempDir/image.png').create();
+                                await file.writeAsBytes(imageInUnit8List as List<int>);
+
                                 setState(() {
-                                //  photo = File(result.files.single.path as String);
+                                  photo = file;
                                   // TODO: Set image
                                 });
                               }
+
                             },
                             child: Image.asset('profilephoto.png'),
                           )
@@ -237,25 +246,20 @@ class _ProfileFormState extends State<ProfileForm> {
                                 });
                               },
                             ),
-                            SizedBox(height: 20),
-                            Text(
-                              "Looking For",
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: size.width * 0.07,
-                              ),
-                            ),
-                            SizedBox(height: 10),
-                            genderListWidget(
-                              ["Male", "Female", "Transgender", "Non-Binary"],
-                              size,
-                              interestedIn,
-                                  (option) {
-                                setState(() {
-                                  interestedIn = option;
-                                });
-                              },
-                            ),
+
+                            SizedBox(height: 50),
+                            // genderListWidget(
+                            //   ["Male", "Female", "Transgender", "Non-Binary"],
+                            //   size,
+                            //   interestedIn,
+                            //       (option) {
+                            //     setState(() {
+                            //       interestedIn = option;
+                            //     });
+                            //   },
+                            // ),
+
+                            // TODO: Add tag function
                           ],
                         ),
                         SizedBox(height: 20),

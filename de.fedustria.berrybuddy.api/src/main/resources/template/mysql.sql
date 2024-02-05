@@ -15,5 +15,5 @@ CREATE TABLE IF NOT EXISTS `sessions` (
   `user_id` INT NOT NULL,
   `session_id` TEXT NOT NULL,
   `session_ip` VARCHAR(100) NOT NULL,
-  `session_device` VARCHAR(100) NOT NULL
+  `session_device` VARCHAR(255) NOT NULL
 );

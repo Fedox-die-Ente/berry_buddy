@@ -4,6 +4,7 @@ import de.fedustria.berrybuddy.api.database.impl.MySQLProvider;
 import de.fedustria.berrybuddy.api.model.Session;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
@@ -36,6 +37,14 @@ public class SessionDAO implements DAO<Session> {
     @Override
     public List<Session> fetchAll() {
         return null;
+    }
+
+    public List<Session> fetchAll(final Integer userId) {
+        try {
+            return mySQLProvider.getSessions(userId);
+        } catch (final SQLException e) {
+            return new ArrayList<>();
+        }
     }
 
     public boolean isValidSessionId(final Integer userId, final String sessionId) {

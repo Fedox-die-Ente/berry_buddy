@@ -6,8 +6,10 @@ import de.fedustria.berrybuddy.api.model.Session;
 import de.fedustria.berrybuddy.api.rest.requests.LoginRequest;
 import de.fedustria.berrybuddy.api.rest.requests.RegisterRequest;
 import de.fedustria.berrybuddy.api.rest.response.DefaultResponse;
+import de.fedustria.berrybuddy.api.rest.response.SessionResponse;
 import de.fedustria.berrybuddy.api.service.JWTService;
 import de.fedustria.berrybuddy.api.service.UserService;
+import de.fedustria.berrybuddy.api.utils.HttpUtils;
 import de.fedustria.berrybuddy.api.utils.IniProvider;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -28,6 +30,7 @@ import java.util.UUID;
 
 import static de.fedustria.berrybuddy.api.utils.Constants.CONF_DIR;
 import static de.fedustria.berrybuddy.api.utils.Constants.DB_INI;
+import static de.fedustria.berrybuddy.api.utils.StringUtils.isEmpty;
 
 @RestController
 public class RESTV1Controller {
@@ -38,8 +41,6 @@ public class RESTV1Controller {
 
     @PostMapping(PREFIX + "/login")
     public ResponseEntity<?> login(@RequestBody final LoginRequest body, final HttpServletResponse response, final HttpServletRequest request) {
-        LOG.info("Login request received for user {}", body.getUsername());
-
         try {
             final var userDAO = new UserDAO(props);
 
@@ -70,12 +71,13 @@ public class RESTV1Controller {
 
     @PostMapping(PREFIX + "/register")
     public ResponseEntity<?> register(@RequestBody final RegisterRequest body) {
-        LOG.info("Register request received for user {}", body.getEmailOrPhone());
-
         try {
             final var userDAO = new UserDAO(props);
 
-            if (UserService.registerUser(userDAO, encoder, body.getEmailOrPhone(), body.getPassword())) {
+            final var email = body.getEmailOrPhone();
+            final var password = body.getPassword();
+
+            if (!isEmpty(email, password) && UserService.registerUser(userDAO, encoder, email, password)) {
                 return new ResponseEntity<>(new DefaultResponse("Successfully registered"), HttpStatus.OK);
             }
         } catch (final Exception e) {
@@ -90,16 +92,16 @@ public class RESTV1Controller {
         try {
             final var sessionDAO = new SessionDAO(props);
 
-            for (final Cookie cookie : request.getCookies()) {
-                if (cookie.getName().equals("_auth")) {
-                    final var tokenOpt = JWTService.decodeToken(cookie.getValue());
-                    if (tokenOpt.isPresent()) {
-                        final var decodedToken = tokenOpt.get();
-                        final var sessionId = decodedToken.getHeaderClaim("sessionId").asString();
-                        sessionDAO.deleteSession(sessionId);
+            final var optCookie = HttpUtils.getCookie(request, "_auth");
+            if (optCookie.isPresent()) {
+                final var cookie = optCookie.get();
+                final var tokenOpt = JWTService.decodeToken(cookie.getValue());
+                if (tokenOpt.isPresent()) {
+                    final var decodedToken = tokenOpt.get();
+                    final var sessionId = decodedToken.getHeaderClaim("sessionId").asString();
+                    sessionDAO.deleteSession(sessionId);
 
-                        return new ResponseEntity<>(new DefaultResponse("Successfully logged out"), HttpStatus.OK);
-                    }
+                    return new ResponseEntity<>(new DefaultResponse("Successfully logged out"), HttpStatus.OK);
                 }
             }
 
@@ -114,17 +116,17 @@ public class RESTV1Controller {
         try {
             final var sessionDAO = new SessionDAO(props);
 
-            for (final Cookie cookie : request.getCookies()) {
-                if (cookie.getName().equals("_auth")) {
-                    final var tokenOpt = JWTService.decodeToken(cookie.getValue());
-                    if (tokenOpt.isPresent()) {
-                        final var decodedToken = tokenOpt.get();
-                        final var userId = decodedToken.getHeaderClaim("userId").asInt();
-                        final var sessionId = decodedToken.getHeaderClaim("sessionId").asString();
+            final var optCookie = HttpUtils.getCookie(request, "_auth");
+            if (optCookie.isPresent()) {
+                final var cookie = optCookie.get();
+                final var tokenOpt = JWTService.decodeToken(cookie.getValue());
+                if (tokenOpt.isPresent()) {
+                    final var decodedToken = tokenOpt.get();
+                    final var userId = decodedToken.getHeaderClaim("userId").asInt();
+                    final var sessionId = decodedToken.getHeaderClaim("sessionId").asString();
 
-                        if (sessionDAO.isValidSessionId(userId, sessionId)) {
-                            return new ResponseEntity<>(new DefaultResponse("Session is valid"), HttpStatus.OK);
-                        }
+                    if (sessionDAO.isValidSessionId(userId, sessionId)) {
+                        return new ResponseEntity<>(new DefaultResponse("Session is valid"), HttpStatus.OK);
                     }
                 }
             }
@@ -132,6 +134,35 @@ public class RESTV1Controller {
             return new ResponseEntity<>(new DefaultResponse("Session is invalid"), HttpStatus.UNAUTHORIZED);
         } catch (final Exception e) {
             return new ResponseEntity<>(new DefaultResponse("Session is invalid"), HttpStatus.UNAUTHORIZED);
+        }
+    }
+
+    @PostMapping(PREFIX + "/sessions")
+    public ResponseEntity<?> getSessions(final HttpServletRequest request) {
+        try {
+            final var sessionDAO = new SessionDAO(props);
+
+            final var optCookie = HttpUtils.getCookie(request, "_auth");
+            if (optCookie.isPresent()) {
+                final var cookie = optCookie.get();
+                final var tokenOpt = JWTService.decodeToken(cookie.getValue());
+                if (tokenOpt.isPresent()) {
+                    final var decodedToken = tokenOpt.get();
+                    final var userId = decodedToken.getHeaderClaim("userId").asInt();
+                    final var sessionId = decodedToken.getHeaderClaim("sessionId").asString();
+
+                    if (sessionDAO.isValidSessionId(userId, sessionId)) {
+                        return new ResponseEntity<>(new SessionResponse(
+                                sessionDAO.fetchAll(userId).stream()
+                                        .map(Session::toSessionDTO).toList()
+                        ), HttpStatus.OK);
+                    }
+                }
+            }
+
+            return new ResponseEntity<>(new DefaultResponse("Failed to get sessions"), HttpStatus.INTERNAL_SERVER_ERROR);
+        } catch (final Exception e) {
+            return new ResponseEntity<>(new DefaultResponse("Failed to get sessions"), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 }

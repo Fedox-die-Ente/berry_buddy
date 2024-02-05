@@ -2,6 +2,7 @@ package de.fedustria.berrybuddy.api.database.impl;
 
 import de.fedustria.berrybuddy.api.data.user.UserRole;
 import de.fedustria.berrybuddy.api.database.DatabaseProvider;
+import de.fedustria.berrybuddy.api.model.Session;
 import de.fedustria.berrybuddy.api.model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -68,8 +69,6 @@ public class MySQLProvider implements DatabaseProvider {
                 properties.getProperty(DB_DATABASE, "")
         );
 
-        LOG.info("URL: {}", url);
-
         try {
             connection = DriverManager.getConnection(url);
             if (connection == null) {
@@ -97,13 +96,11 @@ public class MySQLProvider implements DatabaseProvider {
         final var query = connection.prepareStatement("SELECT * FROM users");
         final var result = query.executeQuery();
         while (result.next()) {
-            LOG.info("User: {}", result.getString("username"));
-
             final var user = User.create(
                     result.getInt("id"),
                     result.getString("name"),
                     result.getString("username"),
-                    UserRole.OWNER,
+                    UserRole.valueOf(result.getString("role")),
                     result.getString("password"),
                     result.getString("avatar_url"),
                     result.getInt("session_id")
@@ -132,13 +129,45 @@ public class MySQLProvider implements DatabaseProvider {
     }
 
     @Override
-    public void removeUser(final User user) {
+    public void removeUser(final User user) throws SQLException {
+        preQuery();
 
+        final var userId = user.getId();
+        final var query = connection.prepareStatement("DELETE FROM users WHERE id = ?");
+        query.setInt(1, userId);
+        query.execute();
+
+        postQuery();
     }
 
     @Override
     public void updateUser(final User user) {
 
+    }
+
+    @Override
+    public List<Session> getSessions(final Integer userId) throws SQLException {
+        final List<Session> list = new ArrayList<>();
+
+        preQuery();
+
+        final var query = connection.prepareStatement("SELECT * FROM sessions WHERE user_id = ?");
+        query.setInt(1, userId);
+        final var result = query.executeQuery();
+
+        while (result.next()) {
+            list.add(new Session(
+                    result.getInt("user_id"),
+                    result.getString("session_id"),
+                    result.getInt("id"),
+                    result.getString("session_ip"),
+                    result.getString("session_device")
+            ));
+        }
+
+        postQuery();
+
+        return list;
     }
 
     @Override

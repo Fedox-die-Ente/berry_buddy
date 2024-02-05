@@ -1,20 +1,29 @@
+import 'package:berry_buddy/blocs/notifications/bloc.dart';
+import 'package:berry_buddy/widgets/notificationForm.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
-class Notifications extends StatefulWidget {
-  final String userId;
+import '../../repositories/userRepository.dart';
 
-  const Notifications({required this.userId});
+class Notifications extends StatelessWidget {
+  final UserRepository _userRepository;
 
-  @override
-  _NotificationState createState() => _NotificationState();
-}
+  Notifications({required UserRepository userRepository})
+      : _userRepository = userRepository;
 
-class _NotificationState extends State<Notifications> {
+
   @override
   Widget build(BuildContext context) {
-    return const Text(
-      "Notifications",
-      style: TextStyle(fontSize: 30.0, fontWeight: FontWeight.bold),
+    return Scaffold(
+      body: BlocProvider<NotificationBloc>(
+        create: (context) => NotificationBloc(
+          userRepository: _userRepository ,
+        ),
+        child: NotificationWidget(
+          userRepository: _userRepository,
+        ),
+      ),
     );
   }
 

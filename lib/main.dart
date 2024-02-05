@@ -59,7 +59,7 @@ class MyApp extends StatelessWidget {
           }
           if (state is Authenticated) {
             return Tabs(
-              userId: state.userId,
+              userId: _userRepository,
             );
           }
           if (state is AuthenticatedButNotSet) {

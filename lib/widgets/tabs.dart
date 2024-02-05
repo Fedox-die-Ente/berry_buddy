@@ -1,3 +1,4 @@
+import 'package:berry_buddy/repositories/userRepository.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -13,39 +14,38 @@ import '../ui/pages/sma.dart';
 
 
 class Tabs extends StatelessWidget {
-  final userId;
+  final UserRepository userId;
 
-  const Tabs({this.userId});
+  const Tabs({required UserRepository this.userId});
 
   @override
   Widget build(BuildContext context) {
     List<Widget> pages = [
-      SMA(
-        userId: userId,
-      ),
-      SMA(
-        userId: userId,
-      ),
-      // CARD SWIPE
-      SMA(
-        userId: userId,
-      ),
-      // MESSAGES
-      Messages(
-        userId: userId,
-      ),
+      // SMA(
+      //   userId: userId,
+      // ),
+      // SMA(
+      //   userId: userId,
+      // ),
+      // // CARD SWIPE
+      // SMA(
+      //   userId: userId,
+      // ),
+      // // MESSAGES
+      // Messages(
+      //   userId: userId,
+      // ),
       // Notifications
       Notifications(
-        userId: userId,
+        userRepository: userId,
       ),
 
     ];
 
     return Theme(
       data: ThemeData(
-        primaryColor: kPrimaryColor,
-        colorScheme: ColorScheme.fromSwatch()
-        .copyWith(secondary: kPrimaryColor),
+        primaryColor: kPrimaryColor, colorScheme: ColorScheme.fromSwatch()
+        .copyWith(secondary: kPrimaryColor).copyWith(background: Colors.deepPurple.shade700),
       ),
       child: DefaultTabController(
         length: 5,

@@ -69,7 +69,7 @@ class Home extends StatelessWidget {
                 ),
               ],
             ),
-            SizedBox(height: 50),
+            const SizedBox(height: 50),
             Container(
               width: 250, // Adjust the width as needed
               child: Column(

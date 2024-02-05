@@ -66,7 +66,7 @@ class SignUpBloc extends Bloc<SignUpEvent, SignUpState> {
     required String password,
   }) async* {
     yield SignUpState.loading();
-
+    print("wtf");
     try {
       if (await _userRepository.signUpWithEmail(email, password)) {
         yield SignUpState.success();

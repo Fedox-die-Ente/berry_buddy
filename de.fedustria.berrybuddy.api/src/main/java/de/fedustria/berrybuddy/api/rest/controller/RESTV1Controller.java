@@ -74,7 +74,7 @@ public class RESTV1Controller {
         try {
             final var userDAO = new UserDAO(props);
 
-            final var email = body.getEmailOrPhone();
+            final var email = body.getEmail();
             final var password = body.getPassword();
 
             if (!isEmpty(email, password) && UserService.registerUser(userDAO, encoder, email, password)) {

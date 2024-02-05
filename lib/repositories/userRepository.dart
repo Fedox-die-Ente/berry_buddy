@@ -1,22 +1,22 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:geolocator/geolocator.dart';
-import 'dart:convert';
 import 'package:http/http.dart' as http;
+
 class UserRepository {
-
-  Future<void> signInWithEmail(String email, String password) async {
+  Future<bool> signInWithEmail(String email, String password) async {
     http.Response response =
-    await http.post(Uri.parse('http://localhost:8080/api/v1/login'),
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: jsonEncode({
-          'username': email,
-          'password': password,
-        }));
+        await http.post(Uri.parse('http://localhost:8080/api/v1/login'),
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: jsonEncode({
+              'username': email,
+              'password': password,
+            }));
 
-    print(response.body);
+    return response.statusCode == 200;
   }
 
   Future<bool> isFirstTime(String userId) async {
@@ -27,10 +27,18 @@ class UserRepository {
     return exists;
   }
 
-  Future<void> signUpWithEmail(String email, String password) async {
-    print(email);
-    print(password);
-    // TODO: Register the user in the database and return
+  Future<bool> signUpWithEmail(String email, String password) async {
+    http.Response response =
+        await http.post(Uri.parse('http://localhost:8080/api/v1/register'),
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: jsonEncode({
+              'email': email,
+              'password': password,
+            }));
+
+    return response.statusCode == 200;
   }
 
   Future<void> signOut() async {

@@ -4,6 +4,6 @@ import lombok.Getter;
 
 @Getter
 public class RegisterRequest {
-    private String emailOrPhone;
+    private String email;
     private String password;
 }

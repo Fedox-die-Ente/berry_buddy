@@ -1,7 +1,11 @@
 import 'package:berry_buddy/blocs/authentication/authentication_bloc.dart';
+import 'package:berry_buddy/blocs/authentication/authentication_state.dart';
 import 'package:berry_buddy/repositories/userRepository.dart';
 import 'package:berry_buddy/ui/pages/home.dart';
+import 'package:berry_buddy/ui/pages/login.dart';
+import 'package:berry_buddy/ui/pages/splash.dart';
 import 'package:berry_buddy/ui/pages/test.dart';
+import 'package:berry_buddy/widgets/tabs.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -47,7 +51,29 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.deepPurple,
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      home: Home(userRepository: _userRepository),
+      //home: Home(userRepository: _userRepository),
+      home: BlocBuilder<AuthenticationBloc, AuthenticationState> (
+        builder: (context, state) {
+          if(state is Uninitialized) {
+            return Splash();
+          }
+          if (state is Authenticated) {
+            return Tabs(
+              userId: state.userId,
+            );
+          }
+          if (state is AuthenticatedButNotSet) {
+            // Signed up but not finished setup
+            print("go to profile setup");
+
+          }
+          if(state is Unauthenticated) {
+            return Home(userRepository: _userRepository);
+          } else {
+            return Container();
+          }
+        }
+      )
     );
   }
 }

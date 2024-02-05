@@ -22,7 +22,7 @@ class UserRepository {
   Future<bool> isFirstTime(String userId) async {
     bool? exists;
     // TODO: Check if user already exists in the database.
-    exists = false;
+    exists = true;
 
     return exists;
   }
@@ -55,7 +55,7 @@ class UserRepository {
   Future<String> getUser() async {
     // TODO: Get through the currentUser the UID
     // For testing purposes
-    return "";
+    return "1";
   }
 
   // Profile Setup

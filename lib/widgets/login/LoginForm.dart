@@ -79,7 +79,6 @@ class _LoginFormState extends State<LoginForm> {
 
         listener: (context, state) {
           if (state.isFailure) {
-            Scaffold.of(context);
             ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(
 
@@ -95,13 +94,12 @@ class _LoginFormState extends State<LoginForm> {
           }
 
           if (state.isSubmitting) {
-            Scaffold.of(context);
             ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(
                   content: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: <Widget>[
-                      Text(" Logging In..."),
+                      Text("Logging In..."),
                       CircularProgressIndicator(),
                     ],
                   ),
@@ -110,6 +108,7 @@ class _LoginFormState extends State<LoginForm> {
           }
 
           if (state.isSuccess) {
+            Navigator.of(context).pop();
             BlocProvider.of<AuthenticationBloc>(context).add(LoggedIn());
           }
         },

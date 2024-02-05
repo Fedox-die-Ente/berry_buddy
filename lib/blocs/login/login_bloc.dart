@@ -15,7 +15,6 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
         _userRepository = userRepository,
       super(LoginState.empty());
 
-  @override
   LoginState get initialState => LoginState.empty();
 
   @override
@@ -54,12 +53,12 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
 
   Stream<LoginState> _mapEmailChangedToState(String email) async* {
     yield state.update(
-      isEmailValid: Validators.isValidEmail(email),
+      isEmailValid: Validators.isValidEmail(email), isPasswordValid: false,
     );
   }
 
   Stream<LoginState> _mapPasswordChangedToState(String password) async* {
-    yield state.update(isEmailValid: Validators.isValidPassword(password));
+    yield state.update(isPasswordValid: Validators.isValidPassword(password), isEmailValid: false);
   }
 
   Stream<LoginState> _mapLoginWithCredentialsPressedToState({

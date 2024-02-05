@@ -82,11 +82,12 @@ class _LoginFormState extends State<LoginForm> {
             Scaffold.of(context);
             ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(
+
                   content: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: <Widget>[
-                      Text("Login Failed"),
-                      Icon(Icons.error),
+                      Text("Login failed. Check your credentials."),
+                      Icon(color: Colors.red, Icons.error_outline)
                     ],
                   ),
                 ),

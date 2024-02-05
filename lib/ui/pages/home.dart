@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../repositories/userRepository.dart';
-import '../../screens/login/login.dart';
 import 'login.dart';
 
 class Home extends StatelessWidget {

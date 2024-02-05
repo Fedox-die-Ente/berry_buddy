@@ -10,6 +10,8 @@ import java.util.Optional;
 public interface DatabaseProvider {
     List<User> getUsers() throws SQLException;
 
+    List<User> getUsers(int page, int limit) throws SQLException;
+
     Optional<User> getUser(Integer id) throws SQLException;
 
     void addUser(User user) throws SQLException;

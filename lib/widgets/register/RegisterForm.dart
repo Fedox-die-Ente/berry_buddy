@@ -13,10 +13,10 @@ class SignUpForm extends StatefulWidget {
       : _userRepository = userRepository;
 
   @override
-  Register createState() => Register();
+  _RegisterFormState createState() => _RegisterFormState();
 }
 
-class Register extends State<SignUpForm> {
+class _RegisterFormState extends State<SignUpForm> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 

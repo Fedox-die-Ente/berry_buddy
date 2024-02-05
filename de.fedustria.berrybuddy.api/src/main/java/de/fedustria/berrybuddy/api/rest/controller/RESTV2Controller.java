@@ -1,11 +1,15 @@
 package de.fedustria.berrybuddy.api.rest.controller;
 
 import de.fedustria.berrybuddy.api.dao.UserDAO;
+import de.fedustria.berrybuddy.api.model.User;
+import de.fedustria.berrybuddy.api.rest.requests.UserListRequest;
 import de.fedustria.berrybuddy.api.rest.response.DefaultResponse;
+import de.fedustria.berrybuddy.api.rest.response.UsersResponse;
 import de.fedustria.berrybuddy.api.utils.IniProvider;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -31,6 +35,25 @@ public class RESTV2Controller {
         }
 
         return new ResponseEntity<>(new DefaultResponse("User not found"), HttpStatus.NOT_FOUND);
+    }
+
+    @GetMapping(PREFIX + "/users")
+    public ResponseEntity<UsersResponse> getUsers(@RequestBody final UserListRequest request) {
+        var page = 1;
+        var limit = 50;
+
+        if (request.getPage() != null) {
+            page = Math.max(request.getPage(), 0);
+        }
+
+        if (request.getLimit() != null) {
+            limit = Math.min(Math.max(request.getLimit(), 0), 100);
+        }
+
+        final var userDAO = new UserDAO(props);
+        final var users = userDAO.fetchLimited(page, limit);
+
+        return new ResponseEntity<>(new UsersResponse(users.stream().map(User::toUserDTO).toList()), HttpStatus.OK);
     }
 
     @GetMapping(PREFIX + "/chats")

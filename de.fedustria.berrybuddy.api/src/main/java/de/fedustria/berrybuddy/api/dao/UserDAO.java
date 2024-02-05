@@ -47,6 +47,15 @@ public class UserDAO implements DAO<User> {
         }
     }
 
+    public List<User> fetchLimited(final int page, final int limit) {
+        try {
+            return mySQLProvider.getUsers(page, limit);
+        } catch (final Exception e) {
+            LOG.error("Error while fetching users", e);
+            return new ArrayList<>();
+        }
+    }
+
     public Optional<User> fetchById(final Integer id) {
         try {
             return mySQLProvider.getUser(id);

@@ -115,6 +115,34 @@ public class MySQLProvider implements DatabaseProvider {
     }
 
     @Override
+    public List<User> getUsers(final int page, final int limit) throws SQLException {
+        final List<User> list = new ArrayList<>();
+
+        preQuery();
+
+        final var query = connection.prepareStatement("SELECT * FROM users LIMIT ? OFFSET ?");
+        query.setInt(1, limit);
+        query.setInt(2, page * limit);
+        final var result = query.executeQuery();
+        while (result.next()) {
+            final var user = User.create(
+                    result.getInt("id"),
+                    result.getString("name"),
+                    result.getString("username"),
+                    UserRole.valueOf(result.getString("role")),
+                    result.getString("password"),
+                    result.getString("avatar_url"),
+                    result.getInt("session_id")
+            );
+
+            list.add(user);
+        }
+
+        postQuery();
+        return list;
+    }
+
+    @Override
     public Optional<User> getUser(final Integer id) throws SQLException {
         preQuery();
 

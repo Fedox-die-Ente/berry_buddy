@@ -66,13 +66,19 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
     String? password,
   }) async* {
     yield LoginState.loading();
-
     try {
-      await _userRepository.signInWithEmail(email!, password!);
+      bool signInSuccess = await _userRepository.signInWithEmail(email!, password!);
 
-      yield LoginState.success();
+      if (signInSuccess) {
+        print("login success");
+        yield LoginState.success();
+      } else {
+        print("login failed");
+        yield LoginState.failure();
+      }
     } catch (_) {
-      LoginState.failure();
+      yield LoginState.failure();
     }
   }
+
 }

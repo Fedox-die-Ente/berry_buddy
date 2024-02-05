@@ -6,6 +6,7 @@ CREATE TABLE IF NOT EXISTS `users` (
   `role` ENUM('OWNER', 'USER') NOT NULL DEFAULT 'USER',
   `avatar_url` VARCHAR(200) NOT NULL,
   `session_id` INT NOT NULL,
+  `birth_date` DATE,
   `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   `last_activity` TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );

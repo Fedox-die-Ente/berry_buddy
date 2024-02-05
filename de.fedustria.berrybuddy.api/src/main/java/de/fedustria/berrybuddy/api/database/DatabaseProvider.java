@@ -5,9 +5,12 @@ import de.fedustria.berrybuddy.api.model.User;
 
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Optional;
 
 public interface DatabaseProvider {
     List<User> getUsers() throws SQLException;
+
+    Optional<User> getUser(Integer id) throws SQLException;
 
     void addUser(User user) throws SQLException;
 

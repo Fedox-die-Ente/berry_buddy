@@ -14,6 +14,7 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Properties;
 
 import static de.fedustria.berrybuddy.api.utils.Constants.*;
@@ -111,6 +112,33 @@ public class MySQLProvider implements DatabaseProvider {
 
         postQuery();
         return list;
+    }
+
+    @Override
+    public Optional<User> getUser(final Integer id) throws SQLException {
+        preQuery();
+
+        final var query = connection.prepareStatement("SELECT * FROM users WHERE id = ?");
+        query.setInt(1, id);
+        final var result = query.executeQuery();
+        if (result.next()) {
+            final var user = User.create(
+                    result.getInt("id"),
+                    result.getString("name"),
+                    result.getString("username"),
+                    UserRole.valueOf(result.getString("role")),
+                    result.getString("password"),
+                    result.getString("avatar_url"),
+                    result.getInt("session_id")
+            );
+
+            postQuery();
+            return Optional.of(user);
+        }
+
+        postQuery();
+
+        return Optional.empty();
     }
 
     @Override

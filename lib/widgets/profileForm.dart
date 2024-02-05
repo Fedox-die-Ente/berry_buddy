@@ -1,6 +1,9 @@
 import 'dart:io';
+import 'dart:typed_data';
+
 import 'package:berry_buddy/constants.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:geolocator/geolocator.dart';
@@ -12,6 +15,7 @@ import '../blocs/profile/profile_event.dart';
 import '../blocs/profile/profile_state.dart';
 import '../repositories/userRepository.dart';
 import 'gender.dart';
+import 'package:image/image.dart' as img;
 
 class ProfileForm extends StatefulWidget {
   final UserRepository _userRepository;
@@ -26,6 +30,9 @@ class ProfileForm extends StatefulWidget {
 
 class _ProfileFormState extends State<ProfileForm> {
   final TextEditingController _nameController = TextEditingController();
+
+  DateTime? selectedDate;
+  final TextEditingController birthdateController = TextEditingController();
 
   String? gender, interestedIn;
   DateTime? age;
@@ -141,6 +148,13 @@ class _ProfileFormState extends State<ProfileForm> {
                               //     photo = getPic;
                               //   });
                               // }
+                              FilePickerResult? result = await FilePicker.platform.pickFiles(type: FileType.image);
+                              if (result != null) {
+                                setState(() {
+                                //  photo = File(result.files.single.path as String);
+                                  // TODO: Set image
+                                });
+                              }
                             },
                             child: Image.asset('profilephoto.png'),
                           )
@@ -177,11 +191,27 @@ class _ProfileFormState extends State<ProfileForm> {
                             //   },
                             // );
                           },
-                          child: Text(
-                            "Enter Birthday",
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: size.width * 0.05,
+                          child: TextField(
+                            controller: birthdateController,
+                            onTap: () async {
+                              DateTime currentDate = DateTime.now();
+                              DateTime? pickedDate = await showDatePicker(
+                                context: context,
+                                initialDate: currentDate,
+                                firstDate: DateTime(1900),
+                                lastDate: currentDate,
+                              );
+
+                              if (pickedDate != null && pickedDate != currentDate) {
+                                birthdateController.text = pickedDate.toLocal().toString().split(' ')[0];
+                                age = pickedDate;
+                              }
+                            },
+                            style: const TextStyle(color: Colors.white),
+                            decoration: const InputDecoration(
+                              hintText: "Birthdate",
+                              hintStyle: TextStyle(color: Colors.grey),
+                              border: InputBorder.none,
                             ),
                           ),
                         ),
@@ -266,12 +296,15 @@ class _ProfileFormState extends State<ProfileForm> {
       ),
     );
   }
+
 }
+
 Widget textFieldWidget(controller, text, size) {
   return Padding(
     padding: EdgeInsets.all(size.height * 0.02),
     child: TextField(
       controller: controller,
+      style: TextStyle(color: Colors.white),
       decoration: InputDecoration(
         labelText: text,
         labelStyle: TextStyle(
@@ -288,6 +321,7 @@ Widget textFieldWidget(controller, text, size) {
     ),
   );
 }
+
 
 Widget genderListWidget(
     List<String> options,
@@ -340,7 +374,6 @@ Widget genderIconWidget(
             size: size.width * 0.07,
           ),
         ),
-        SizedBox(height: 5.0),
         // Text(
         //   label,
         //   style: TextStyle(

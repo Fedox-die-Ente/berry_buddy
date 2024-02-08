@@ -2,16 +2,14 @@ package de.fedustria.berrybuddy.api.rest.controller;
 
 import de.fedustria.berrybuddy.api.dao.UserDAO;
 import de.fedustria.berrybuddy.api.model.User;
+import de.fedustria.berrybuddy.api.rest.requests.UpdateProfileRequest;
 import de.fedustria.berrybuddy.api.rest.requests.UserListRequest;
 import de.fedustria.berrybuddy.api.rest.response.DefaultResponse;
 import de.fedustria.berrybuddy.api.rest.response.UsersResponse;
 import de.fedustria.berrybuddy.api.utils.IniProvider;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.io.File;
 import java.util.Properties;
@@ -69,5 +67,13 @@ public class RESTV2Controller {
     @GetMapping(PREFIX + "/notifications/{id}")
     public void getNotification(@RequestParam final Integer id) {
 
+    }
+
+    @PostMapping(PREFIX + "/updateProfile")
+    public void updateProfile(@RequestBody final UpdateProfileRequest request) {
+        System.out.println(request.getName());
+        System.out.println(request.getGender());
+        System.out.println(request.getBirthdate());
+        System.out.println(request.getLocation());
     }
 }

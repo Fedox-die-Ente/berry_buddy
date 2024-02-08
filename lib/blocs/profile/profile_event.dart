@@ -1,8 +1,8 @@
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:equatable/equatable.dart';
-import 'package:flutter/cupertino.dart';
-import 'package:geolocator/geolocator.dart';
+import 'package:geopoint/geopoint.dart';
 
 abstract class ProfileEvent extends Equatable {
   const ProfileEvent();
@@ -57,28 +57,27 @@ class InterestedInChanged extends ProfileEvent {
 }
 
 class LocationChanged extends ProfileEvent {
-  final Geolocator location;
+  final GeoPoint location;
 
-  LocationChanged({required this.location});
+  const LocationChanged({required this.location});
 
   @override
   List<Object> get props => [location];
 }
 
 class Submitted extends ProfileEvent {
-  final String name, gender, interestedIn;
+  final String name, gender;
   final DateTime age;
-  final Geolocator location;
-  final File photo;
+  final GeoPoint location;
+  final Uint8List photo;
 
-  Submitted(
+  const Submitted(
       {required this.name,
         required this.gender,
-        required this.interestedIn,
         required this.age,
         required this.location,
         required this.photo});
 
   @override
-  List<Object> get props => [location, name, age, gender, interestedIn, photo];
+  List<Object> get props => [location, name, age, gender, photo];
 }

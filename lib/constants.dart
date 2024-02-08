@@ -8,6 +8,7 @@ const devTeamFounders = ["Fedox", "Austria"];
 const kBackgroundColor = Color(0xff473450);
 const kTextFieldFill = Color(0xff1E1C24);
 const kPrimaryColor = Color(0xff7241a9);
+const isWebMode = true;
 // TextStyles
 const kHeadline = TextStyle(
   color: Colors.white,

@@ -54,6 +54,8 @@ dependencies:
   flutter_launcher_icons: ^0.11.0
   image: ^3.0.1
   path_provider: ^2.1.2
+  image_picker_web: ^3.1.1
+  geopoint: ^1.0.0
 
 
 dev_dependencies:
@@ -80,6 +82,11 @@ flutter:
   assets:
     - assets/profilephoto.png
     - assets/non_binary.png
+
+  fonts:
+    - family: Berrybuddy_icons
+      fonts:
+        - asset: fonts/Berrybuddy_icons.ttf
 
   # To add assets to your application, add an assets section, like this:
   # assets:

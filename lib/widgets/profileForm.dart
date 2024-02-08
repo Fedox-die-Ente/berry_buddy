@@ -1,22 +1,21 @@
-import 'dart:convert';
+
+import 'dart:html';
 import 'dart:io';
 
-import 'package:berry_buddy/constants.dart';
+import 'package:berry_buddy/utils/icons.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:file_picker/file_picker.dart';
-import 'package:path_provider/path_provider.dart' as prov;
+import 'package:geopoint/geopoint.dart';
+
 import '../blocs/authentication/authentication_bloc.dart';
 import '../blocs/authentication/authentication_event.dart';
 import '../blocs/profile/profile_bloc.dart';
 import '../blocs/profile/profile_event.dart';
 import '../blocs/profile/profile_state.dart';
 import '../repositories/userRepository.dart';
-import 'gender.dart';
-import 'package:image/image.dart' as img;
 
 class ProfileForm extends StatefulWidget {
   final UserRepository _userRepository;
@@ -37,26 +36,25 @@ class _ProfileFormState extends State<ProfileForm> {
 
   String? gender, interestedIn;
   DateTime? age;
-  File? photo;
-  Geolocator? location;
+  GeoPoint? location;
   ProfileBloc? _profileBloc;
+  Uint8List? fileBytes;
 
   bool get isFilled =>
       _nameController.text.isNotEmpty &&
           gender != null &&
-          interestedIn != null &&
-          photo != null &&
+          fileBytes != null &&
           age != null;
 
   bool isButtonEnabled(ProfileState state) {
+
     return isFilled && !state.isSubmitting;
   }
 
   _getLocation() async {
-    // Position position = await Geolocator()
-    //     .getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
-    //
-    // location = GeoPoint(position.latitude, position.longitude);
+    Position position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
+
+    location = GeoPoint(latitude: position.latitude, longitude: position.longitude);
   }
 
   _onSubmitted() async {
@@ -67,8 +65,7 @@ class _ProfileFormState extends State<ProfileForm> {
         age: age!,
         location: location!,
         gender: gender!,
-        interestedIn: interestedIn!,
-        photo: photo!,
+        photo: fileBytes!,
       ),
     );
   }
@@ -129,77 +126,52 @@ class _ProfileFormState extends State<ProfileForm> {
                   margin: EdgeInsets.symmetric(horizontal: size.width * 0.1),
                   padding: EdgeInsets.all(20),
                   decoration: BoxDecoration(
-                    color: Colors.black.withOpacity(0.5), // Dunkle Farbe für das Vordergrund-Panel
+                    color: Colors.black.withOpacity(0.5),
+                    // Dunkle Farbe für das Vordergrund-Panel
                     borderRadius: BorderRadius.circular(15),
                   ),
-                  child: SingleChildScrollView( // Füge einen SingleChildScrollView hinzu, um den RenderFlex-Fehler zu beheben
+                  child: SingleChildScrollView(
+                    // Füge einen SingleChildScrollView hinzu, um den RenderFlex-Fehler zu beheben
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: <Widget>[
                         CircleAvatar(
                           radius: size.width * 0.15,
                           backgroundColor: Colors.transparent,
-                          child: photo == null
+                          child: fileBytes == null
                               ? GestureDetector(
                             onTap: () async {
-                              // File getPic = await FilePicker.getFile(
-                              //     type: FileType.image);
-                              // if (getPic != null) {
-                              //   setState(() {
-                              //     photo = getPic;
-                              //   });
-                              // }
-                              FilePickerResult? result = await FilePicker.platform.pickFiles(type: FileType.image);
+                              FilePickerResult? result = await FilePicker
+                                  .platform
+                                  .pickFiles(type: FileType.image);
                               if (result != null) {
-                                Uint8List? uploadfile = result.files.single.bytes;
-                                Uint8List? imageInUnit8List = uploadfile;
-                              //  final tempDir = await getTemporaryDirectory();
-                                final tempDir = prov.getTemporaryDirectory();
-                                File file = await File('$tempDir/image.png').create();
-                                await file.writeAsBytes(imageInUnit8List as List<int>);
-
                                 setState(() {
-                                  photo = file;
-                                  // TODO: Set image
+                                  fileBytes = result.files.first.bytes;
                                 });
                               }
-
                             },
                             child: Image.asset('profilephoto.png'),
                           )
                               : GestureDetector(
                             onTap: () async {
-                              // File getPic = await FilePicker.getFile(
-                              //     type: FileType.image);
-                              // if (getPic != null) {
-                              //   setState(() {
-                              //     photo = getPic;
-                              //   });
-                              // }
+                              FilePickerResult? result = await FilePicker
+                                  .platform
+                                  .pickFiles(type: FileType.image);
+                              if (result != null) {
+                                setState(() {
+                                  fileBytes = result.files.first.bytes;
+                                });
+                              }
                             },
                             child: CircleAvatar(
                               radius: size.width * 0.15,
-                              backgroundImage: FileImage(photo!),
+                              backgroundImage: MemoryImage(fileBytes!),
                             ),
                           ),
                         ),
                         SizedBox(height: 20),
                         textFieldWidget(_nameController, "Name", size),
                         GestureDetector(
-                          onTap: () {
-                            // DatePicker.showDatePicker(
-                            //   context,
-                            //   showTitleActions: true,
-                            //   minTime: DateTime(1900, 1, 1),
-                            //   maxTime: DateTime(DateTime.now().year - 19, 1, 1),
-                            //   onConfirm: (date) {
-                            //     setState(() {
-                            //       age = date;
-                            //     });
-                            //     print(age);
-                            //   },
-                            // );
-                          },
                           child: TextField(
                             controller: birthdateController,
                             onTap: () async {
@@ -211,8 +183,12 @@ class _ProfileFormState extends State<ProfileForm> {
                                 lastDate: currentDate,
                               );
 
-                              if (pickedDate != null && pickedDate != currentDate) {
-                                birthdateController.text = pickedDate.toLocal().toString().split(' ')[0];
+                              if (pickedDate != null &&
+                                  pickedDate != currentDate) {
+                                birthdateController.text = pickedDate
+                                    .toLocal()
+                                    .toString()
+                                    .split(' ')[0];
                                 age = pickedDate;
                               }
                             },
@@ -224,7 +200,7 @@ class _ProfileFormState extends State<ProfileForm> {
                             ),
                           ),
                         ),
-                        SizedBox(height: 20),
+                        const SizedBox(height: 20),
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: <Widget>[
@@ -235,7 +211,7 @@ class _ProfileFormState extends State<ProfileForm> {
                                 fontSize: size.width * 0.07,
                               ),
                             ),
-                            SizedBox(height: 10),
+                            const SizedBox(height: 10),
                             genderListWidget(
                               ["Male", "Female", "Transgender", "Non-Binary"],
                               size,
@@ -246,23 +222,9 @@ class _ProfileFormState extends State<ProfileForm> {
                                 });
                               },
                             ),
-
-                            SizedBox(height: 50),
-                            // genderListWidget(
-                            //   ["Male", "Female", "Transgender", "Non-Binary"],
-                            //   size,
-                            //   interestedIn,
-                            //       (option) {
-                            //     setState(() {
-                            //       interestedIn = option;
-                            //     });
-                            //   },
-                            // ),
-
-                            // TODO: Add tag function
                           ],
                         ),
-                        SizedBox(height: 20),
+                        const SizedBox(height: 20),
                         GestureDetector(
                           onTap: () {
                             if (isButtonEnabled(state)) {
@@ -300,7 +262,6 @@ class _ProfileFormState extends State<ProfileForm> {
       ),
     );
   }
-
 }
 
 Widget textFieldWidget(controller, text, size) {
@@ -308,7 +269,7 @@ Widget textFieldWidget(controller, text, size) {
     padding: EdgeInsets.all(size.height * 0.02),
     child: TextField(
       controller: controller,
-      style: TextStyle(color: Colors.white),
+      style: const TextStyle(color: Colors.white),
       decoration: InputDecoration(
         labelText: text,
         labelStyle: TextStyle(
@@ -326,7 +287,6 @@ Widget textFieldWidget(controller, text, size) {
   );
 }
 
-
 Widget genderListWidget(
     List<String> options,
     Size size,
@@ -342,7 +302,7 @@ Widget genderListWidget(
             : option == "Male"
             ? Icons.male
             : option == "Non-Binary"
-            ? Icons.transgender
+            ? Berrybuddy_icons.non_binary
             : Icons.transgender,
         option,
         size,
@@ -371,20 +331,13 @@ Widget genderIconWidget(
         CircleAvatar(
           radius: size.width * 0.07,
           backgroundColor:
-          selectedOption == label ? Colors.white : Colors.transparent,
+          selectedOption == label ? Colors.deepPurple : Colors.transparent,
           child: Icon(
             icon,
             color: Colors.white,
             size: size.width * 0.07,
           ),
         ),
-        // Text(
-        //   label,
-        //   style: TextStyle(
-        //     color: Colors.white,
-        //     fontSize: size.width * 0.04,
-        //   ),
-        // ),
       ],
     ),
   );

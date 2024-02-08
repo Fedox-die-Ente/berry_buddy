@@ -1,7 +1,9 @@
 import 'dart:convert';
-import 'dart:io';
+
+import 'dart:typed_data';
 
 import 'package:geolocator/geolocator.dart';
+import 'package:geopoint/geopoint.dart';
 import 'package:http/http.dart' as http;
 
 class UserRepository {
@@ -63,13 +65,14 @@ class UserRepository {
 
   // Profile Setup
   Future<void> profileSetup(
-      File photo,
+      Uint8List photo,
       String userId,
       String name,
       String gender,
       String interestedIn,
       DateTime age,
-      Geolocator location) async {
+      GeoPoint location) async {
+    print("ja");
     // TODO: Store in database
   }
 }

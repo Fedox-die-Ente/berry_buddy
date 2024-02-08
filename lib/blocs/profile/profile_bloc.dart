@@ -1,7 +1,8 @@
 import 'dart:async';
 import 'dart:io';
+import 'dart:typed_data';
 import 'package:bloc/bloc.dart';
-import 'package:geolocator/geolocator.dart';
+import 'package:geopoint/geopoint.dart';
 
 import 'package:meta/meta.dart';
 import '../../repositories/userRepository.dart';
@@ -41,7 +42,7 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
           userId: uid,
           age: event.age,
           location: event.location,
-          interestedIn: event.interestedIn);
+          );
     }
   }
 
@@ -76,19 +77,19 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
     );
   }
 
-  Stream<ProfileState> _mapLocationChangedToState(Geolocator location) async* {
+  Stream<ProfileState> _mapLocationChangedToState(GeoPoint location) async* {
     yield state.update(
       isLocationEmpty: location == null,
     );
   }
 
   Stream<ProfileState> _mapSubmittedToState(
-      {File? photo,
+      {Uint8List? photo,
         String? gender,
         String? name,
         String? userId,
         DateTime? age,
-        Geolocator? location,
+        GeoPoint? location,
         String? interestedIn}) async* {
     yield ProfileState.loading();
     try {

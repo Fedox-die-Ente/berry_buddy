@@ -54,7 +54,6 @@ public class RESTV1Controller {
                 cookie.setPath("/");
                 cookie.setSecure(true);
                 response.addCookie(cookie);
-                response.addHeader("Authorization", "Bearer " + jwt);
 
                 final Session session = new Session(user.getId(), sessionId, request.getRemoteAddr(), request.getHeader("User-Agent"));
                 final var sessionDAO = new SessionDAO(props);

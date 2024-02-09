@@ -73,7 +73,7 @@ public class RESTV2Controller {
     public void updateProfile(@RequestBody final UpdateProfileRequest request) {
         System.out.println(request.getName());
         System.out.println(request.getGender());
-        System.out.println(request.getBirthdate());
-        System.out.println(request.getLocation());
+        System.out.println(request.getAge());
+        System.out.println(request.getLocation().getLatitude() + ", " + request.getLocation().getLongitude());
     }
 }

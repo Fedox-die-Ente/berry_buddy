@@ -19,7 +19,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -34,17 +33,17 @@ import static de.fedustria.berrybuddy.api.utils.StringUtils.isEmpty;
 
 @RestController
 public class RESTV1Controller {
-    private static final Logger          LOG     = LoggerFactory.getLogger(RESTV1Controller.class);
-    private static final String          PREFIX  = "/api/v1";
-    private final        PasswordEncoder encoder = new BCryptPasswordEncoder();
-    private final        Properties      props   = new IniProvider(new File(CONF_DIR, DB_INI)).loadPropertiesNoEx();
+    private static final Logger      LOG         = LoggerFactory.getLogger(RESTV1Controller.class);
+    private static final String      PREFIX      = "/api/v1";
+    private final        Properties  props       = new IniProvider(new File(CONF_DIR, DB_INI)).loadPropertiesNoEx();
+    private final        UserService userService = new UserService(new BCryptPasswordEncoder());
 
     @PostMapping(PREFIX + "/login")
     public ResponseEntity<?> login(@RequestBody final LoginRequest body, final HttpServletResponse response, final HttpServletRequest request) {
         try {
             final var userDAO = new UserDAO(props);
 
-            final var optUser = UserService.getUser(userDAO.fetchAll(), encoder, body.getUsername(), body.getPassword());
+            final var optUser = userService.getUser(userDAO.fetchAll(), body.getUsername(), body.getPassword());
 
             if (optUser.isPresent()) {
                 final var user = optUser.get();
@@ -55,6 +54,7 @@ public class RESTV1Controller {
                 cookie.setPath("/");
                 cookie.setSecure(true);
                 response.addCookie(cookie);
+                response.addHeader("Authorization", "Bearer " + jwt);
 
                 final Session session = new Session(user.getId(), sessionId, request.getRemoteAddr(), request.getHeader("User-Agent"));
                 final var sessionDAO = new SessionDAO(props);
@@ -77,7 +77,7 @@ public class RESTV1Controller {
             final var email = body.getEmail();
             final var password = body.getPassword();
 
-            if (!isEmpty(email, password) && UserService.registerUser(userDAO, encoder, email, password)) {
+            if (!isEmpty(email, password) && userService.registerUser(userDAO, email, password)) {
                 return new ResponseEntity<>(new DefaultResponse("Successfully registered"), HttpStatus.OK);
             }
         } catch (final Exception e) {

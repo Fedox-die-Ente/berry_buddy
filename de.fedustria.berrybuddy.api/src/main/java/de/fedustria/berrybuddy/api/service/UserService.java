@@ -8,23 +8,29 @@ import java.util.List;
 import java.util.Optional;
 
 public class UserService {
-    public static Optional<User> getUser(final List<User> users, final PasswordEncoder encoder, final String username, final String password) {
+    private final PasswordEncoder encoder;
+
+    public UserService(final PasswordEncoder passwordEncoder) {
+        this.encoder = passwordEncoder;
+    }
+
+    public Optional<User> getUser(final List<User> users, final String username, final String password) {
         return users.stream()
                 .filter(user -> user.getUsername().equals(username) && encoder.matches(password, user.getHashedPassword()))
                 .findFirst();
     }
 
-    public static Optional<User> getUser(final List<User> users, final String username) {
+    public Optional<User> getUser(final List<User> users, final String username) {
         return users.stream()
                 .filter(user -> user.getUsername().equals(username))
                 .findFirst();
     }
 
-    public static boolean userExists(final List<User> users, final String username) {
+    public boolean userExists(final List<User> users, final String username) {
         return getUser(users, username).isPresent();
     }
 
-    public static boolean registerUser(final UserDAO userDAO, final PasswordEncoder encoder, final String emailOrPhone, final String password) {
+    public boolean registerUser(final UserDAO userDAO, final String emailOrPhone, final String password) {
         if (userExists(userDAO.fetchAll(), emailOrPhone)) {
             return false;
         }

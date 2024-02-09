@@ -6,7 +6,10 @@ import de.fedustria.berrybuddy.api.rest.requests.UpdateProfileRequest;
 import de.fedustria.berrybuddy.api.rest.requests.UserListRequest;
 import de.fedustria.berrybuddy.api.rest.response.DefaultResponse;
 import de.fedustria.berrybuddy.api.rest.response.UsersResponse;
+import de.fedustria.berrybuddy.api.service.JWTService;
+import de.fedustria.berrybuddy.api.utils.HttpUtils;
 import de.fedustria.berrybuddy.api.utils.IniProvider;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -70,10 +73,19 @@ public class RESTV2Controller {
     }
 
     @PostMapping(PREFIX + "/updateProfile")
-    public void updateProfile(@RequestBody final UpdateProfileRequest request) {
-        System.out.println(request.getName());
-        System.out.println(request.getGender());
-        System.out.println(request.getAge());
-        System.out.println(request.getLocation().getLatitude() + ", " + request.getLocation().getLongitude());
+    public void updateProfile(@RequestBody final UpdateProfileRequest requestBody, final HttpServletRequest request) {
+        final var optCookie = HttpUtils.getCookie(request, "_auth");
+        if (optCookie.isPresent()) {
+            final var cookie = optCookie.get();
+            final var tokenOpt = JWTService.decodeToken(cookie.getValue());
+            if (tokenOpt.isPresent()) {
+                System.out.println("Cookie found: " + cookie.getValue());
+            }
+        }
+
+        System.out.println(requestBody.getName());
+        System.out.println(requestBody.getGender());
+        System.out.println(requestBody.getAge());
+        System.out.println(requestBody.getLocation().getLatitude() + ", " + requestBody.getLocation().getLongitude());
     }
 }

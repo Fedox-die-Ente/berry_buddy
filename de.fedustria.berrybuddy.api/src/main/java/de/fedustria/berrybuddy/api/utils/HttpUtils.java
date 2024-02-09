@@ -8,6 +8,11 @@ import java.util.Optional;
 
 public class HttpUtils {
     public static Optional<Cookie> getCookie(final HttpServletRequest request, final String name) {
-        return Arrays.stream(request.getCookies()).filter(c -> c.getName().equals(name)).findFirst();
+        final var cookies = request.getCookies();
+        if (cookies == null || cookies.length == 0) {
+            return Optional.empty();
+        }
+
+        return Arrays.stream(cookies).filter(c -> c.getName().equals(name)).findFirst();
     }
 }

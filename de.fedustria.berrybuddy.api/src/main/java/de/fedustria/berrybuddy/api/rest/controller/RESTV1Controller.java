@@ -5,13 +5,12 @@ import de.fedustria.berrybuddy.api.dao.UserDAO;
 import de.fedustria.berrybuddy.api.model.Session;
 import de.fedustria.berrybuddy.api.rest.requests.LoginRequest;
 import de.fedustria.berrybuddy.api.rest.requests.RegisterRequest;
+import de.fedustria.berrybuddy.api.rest.requests.SessionRequest;
 import de.fedustria.berrybuddy.api.rest.response.DefaultResponse;
+import de.fedustria.berrybuddy.api.rest.response.LoginResponse;
 import de.fedustria.berrybuddy.api.rest.response.SessionResponse;
-import de.fedustria.berrybuddy.api.service.JWTService;
 import de.fedustria.berrybuddy.api.service.UserService;
-import de.fedustria.berrybuddy.api.utils.HttpUtils;
 import de.fedustria.berrybuddy.api.utils.IniProvider;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
@@ -49,17 +48,11 @@ public class RESTV1Controller {
                 final var user = optUser.get();
                 final var sessionId = UUID.randomUUID().toString();
 
-                final var jwt = JWTService.generateToken(user, sessionId);
-                final var cookie = new Cookie("_auth", jwt);
-                cookie.setPath("/");
-                cookie.setSecure(true);
-                response.addCookie(cookie);
-
                 final Session session = new Session(user.getId(), sessionId, request.getRemoteAddr(), request.getHeader("User-Agent"));
                 final var sessionDAO = new SessionDAO(props);
                 sessionDAO.insert(session);
 
-                return new ResponseEntity<>(user.toUserDTO(), HttpStatus.OK);
+                return new ResponseEntity<>(new LoginResponse(user.toUserDTO(), sessionId), HttpStatus.OK);
             }
         } catch (final Exception e) {
             return new ResponseEntity<>(new DefaultResponse("Failed to check login."), HttpStatus.UNAUTHORIZED);
@@ -87,79 +80,65 @@ public class RESTV1Controller {
     }
 
     @PostMapping(PREFIX + "/logout")
-    public ResponseEntity<?> logout(final HttpServletRequest request) {
+    public ResponseEntity<?> logout(@RequestBody final SessionRequest logoutRequest) {
         try {
             final var sessionDAO = new SessionDAO(props);
+            final var sessionId = logoutRequest.getSessionId();
 
-            final var optCookie = HttpUtils.getCookie(request, "_auth");
-            if (optCookie.isPresent()) {
-                final var cookie = optCookie.get();
-                final var tokenOpt = JWTService.decodeToken(cookie.getValue());
-                if (tokenOpt.isPresent()) {
-                    final var decodedToken = tokenOpt.get();
-                    final var sessionId = decodedToken.getHeaderClaim("sessionId").asString();
-                    sessionDAO.deleteSession(sessionId);
-
-                    return new ResponseEntity<>(new DefaultResponse("Successfully logged out"), HttpStatus.OK);
-                }
+            if (isEmpty(sessionId)) {
+                return new ResponseEntity<>(new DefaultResponse("Failed to logout"), HttpStatus.INTERNAL_SERVER_ERROR);
             }
 
-            return new ResponseEntity<>(new DefaultResponse("Failed to logout"), HttpStatus.INTERNAL_SERVER_ERROR);
+            if (!sessionDAO.isValidSessionId(logoutRequest.getUserId(), sessionId)) {
+                return new ResponseEntity<>(new DefaultResponse("Session is invalid"), HttpStatus.UNAUTHORIZED);
+            }
+
+            sessionDAO.deleteSession(sessionId);
+            return new ResponseEntity<>(new DefaultResponse("Successfully logged out"), HttpStatus.OK);
         } catch (final Exception e) {
             return new ResponseEntity<>(new DefaultResponse("Failed to logout"), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
     @PostMapping(PREFIX + "/validateSession")
-    public ResponseEntity<?> validateSession(final HttpServletRequest request) {
+    public ResponseEntity<?> validateSession(@RequestBody final SessionRequest request) {
         try {
             final var sessionDAO = new SessionDAO(props);
+            final var sessionId = request.getSessionId();
 
-            final var optCookie = HttpUtils.getCookie(request, "_auth");
-            if (optCookie.isPresent()) {
-                final var cookie = optCookie.get();
-                final var tokenOpt = JWTService.decodeToken(cookie.getValue());
-                if (tokenOpt.isPresent()) {
-                    final var decodedToken = tokenOpt.get();
-                    final var userId = decodedToken.getHeaderClaim("userId").asInt();
-                    final var sessionId = decodedToken.getHeaderClaim("sessionId").asString();
-
-                    if (sessionDAO.isValidSessionId(userId, sessionId)) {
-                        return new ResponseEntity<>(new DefaultResponse("Session is valid"), HttpStatus.OK);
-                    }
-                }
+            if (isEmpty(sessionId)) {
+                return new ResponseEntity<>(new DefaultResponse("Session is invalid"), HttpStatus.UNAUTHORIZED);
             }
 
-            return new ResponseEntity<>(new DefaultResponse("Session is invalid"), HttpStatus.UNAUTHORIZED);
+            if (!sessionDAO.isValidSessionId(request.getUserId(), sessionId)) {
+                return new ResponseEntity<>(new DefaultResponse("Session is invalid"), HttpStatus.UNAUTHORIZED);
+            }
+
+            return new ResponseEntity<>(new DefaultResponse("Session is valid"), HttpStatus.OK);
         } catch (final Exception e) {
             return new ResponseEntity<>(new DefaultResponse("Session is invalid"), HttpStatus.UNAUTHORIZED);
         }
     }
 
     @PostMapping(PREFIX + "/sessions")
-    public ResponseEntity<?> getSessions(final HttpServletRequest request) {
+    public ResponseEntity<?> getSessions(@RequestBody final SessionRequest sessionRequest) {
         try {
             final var sessionDAO = new SessionDAO(props);
+            final var sessionId = sessionRequest.getSessionId();
+            final var userId = sessionRequest.getUserId();
 
-            final var optCookie = HttpUtils.getCookie(request, "_auth");
-            if (optCookie.isPresent()) {
-                final var cookie = optCookie.get();
-                final var tokenOpt = JWTService.decodeToken(cookie.getValue());
-                if (tokenOpt.isPresent()) {
-                    final var decodedToken = tokenOpt.get();
-                    final var userId = decodedToken.getHeaderClaim("userId").asInt();
-                    final var sessionId = decodedToken.getHeaderClaim("sessionId").asString();
-
-                    if (sessionDAO.isValidSessionId(userId, sessionId)) {
-                        return new ResponseEntity<>(new SessionResponse(
-                                sessionDAO.fetchAll(userId).stream()
-                                        .map(Session::toSessionDTO).toList()
-                        ), HttpStatus.OK);
-                    }
-                }
+            if (isEmpty(sessionId)) {
+                return new ResponseEntity<>(new DefaultResponse("Failed to get sessions"), HttpStatus.INTERNAL_SERVER_ERROR);
             }
 
-            return new ResponseEntity<>(new DefaultResponse("Failed to get sessions"), HttpStatus.INTERNAL_SERVER_ERROR);
+            if (!sessionDAO.isValidSessionId(userId, sessionId)) {
+                return new ResponseEntity<>(new DefaultResponse("Session is invalid"), HttpStatus.UNAUTHORIZED);
+            }
+
+            return new ResponseEntity<>(new SessionResponse(
+                    sessionDAO.fetchAll(userId).stream()
+                            .map(Session::toSessionDTO).toList()
+            ), HttpStatus.OK);
         } catch (final Exception e) {
             return new ResponseEntity<>(new DefaultResponse("Failed to get sessions"), HttpStatus.INTERNAL_SERVER_ERROR);
         }

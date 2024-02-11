@@ -5,9 +5,11 @@ import lombok.Getter;
 
 @Getter
 public class UserDTO {
-    private final Integer id;
-    private final String  name;
-    private final String  username;
+    // TODO: Add new fields
+
+    private final Integer  id;
+    private final String   name;
+    private final String   username;
     private final UserRole role;
     private final String   avatarURL;
 

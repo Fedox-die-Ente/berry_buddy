@@ -1,12 +1,13 @@
 import 'dart:convert';
-
 import 'dart:typed_data';
 
-import 'package:geolocator/geolocator.dart';
 import 'package:geopoint/geopoint.dart';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 
 class UserRepository {
+  Map currentUser = {};
+
   Future<bool> signInWithEmail(String email, String password) async {
     http.Response response =
         await http.post(Uri.parse('http://localhost:8080/api/v1/login'),
@@ -17,15 +18,37 @@ class UserRepository {
               'username': email,
               'password': password,
             }));
-    print(response.body);
-    return response.statusCode == 200;
+    if (response.statusCode == 200) {
+      final responseData = json.decode(response.body);
+
+      await _saveUserDataLocally(responseData);
+
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  Future<void> _saveUserDataLocally(Map<String, dynamic> userData) async {
+    final prefs = await SharedPreferences.getInstance();
+    prefs.setString('userData', json.encode(userData));
+  }
+
+  Future<Map<String, dynamic>?> getUserData(String userId) async {
+    http.Response response =
+        await http.get(Uri.parse("http://localhost:8080/api/v2/user/$userId"));
+
+    if (response.statusCode == 200) {
+      return json.decode(response.body);
+    }
+    return null;
   }
 
   Future<bool> isFirstTime(String userId) async {
     bool? exists;
 
     http.Response response =
-      await http.get(Uri.parse("http://localhost:8080/api/v2/user/$userId"));
+        await http.get(Uri.parse("http://localhost:8080/api/v2/user/$userId"));
 
     exists = response.statusCode == 200;
 
@@ -48,6 +71,8 @@ class UserRepository {
 
   Future<void> signOut() async {
     // TODO: Return signOut
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove('userData');
   }
 
   Future<bool> isSignedIn() async {
@@ -58,9 +83,14 @@ class UserRepository {
   }
 
   Future<String> getUser() async {
-    // TODO: Get through the currentUser the UID
-    // For testing purposes
-    return "1";
+    final prefs = await SharedPreferences.getInstance();
+    final userDataString = prefs.getString('userData');
+    if (userDataString != null) {
+      final Map<String, dynamic> userData = json.decode(userDataString);
+      final id = userData['id'];
+      return id.toString();
+    }
+    return "";
   }
 
   // Profile Setup

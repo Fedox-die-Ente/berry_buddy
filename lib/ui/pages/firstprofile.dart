@@ -1,11 +1,9 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../blocs/profile/profile_bloc.dart';
-import '../../constants.dart';
 import '../../repositories/userRepository.dart';
-import '../../widgets/profileForm.dart';
+import '../widgets/profileForm.dart';
 
 class ProfileSetup extends StatelessWidget {
   final _userRepository;

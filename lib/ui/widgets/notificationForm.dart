@@ -2,16 +2,15 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../blocs/notifications/notification_bloc.dart';
-import '../blocs/notifications/notification_event.dart';
-import '../blocs/notifications/notification_state.dart';
-import '../repositories/userRepository.dart';
+
+import '../../blocs/notifications/notification_bloc.dart';
+import '../../blocs/notifications/notification_event.dart';
+import '../../blocs/notifications/notification_state.dart';
 
 class NotificationWidget extends StatefulWidget {
-  final UserRepository _userRepository;
+  final String _userId;
 
-  NotificationWidget({required UserRepository userRepository})
-      : _userRepository = userRepository;
+  NotificationWidget({required String userId}) : _userId = userId;
 
   @override
   _NotificationWidgetState createState() => _NotificationWidgetState();
@@ -23,7 +22,7 @@ class _NotificationWidgetState extends State<NotificationWidget> {
   @override
   void initState() {
     super.initState();
-    _notificationBloc = NotificationBloc(userRepository: widget._userRepository);
+    _notificationBloc = NotificationBloc(userId: widget._userId);
   }
 
   @override
@@ -39,27 +38,27 @@ class _NotificationWidgetState extends State<NotificationWidget> {
                 if (index == 0) {
                   return ListTile(
                     title: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.deepPurple.shade600,
-                      ),
-                      onPressed: () {
-                        _notificationBloc.add(ClearNotifications());
-                      },
-                      child: const Text(
-                        'Mark all as read',
-                        style: TextStyle(
-                          color: Colors.white,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor:
+                              const Color.fromRGBO(82, 3, 128, 0.5),
                         ),
-                      )
-                    ),
+                        onPressed: () {
+                          _notificationBloc.add(ClearNotifications());
+                        },
+                        child: const Text(
+                          'Mark all as read',
+                          style: TextStyle(
+                            color: Colors.white,
+                          ),
+                        )),
                   );
                 }
 
-                // Normale Benachrichtigungseinträge
                 return Card(
                   elevation: 5,
-                  color: Colors.deepPurple.shade500,
-                  margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+                  color: const Color.fromRGBO(82, 3, 128, 0.6),
+                  margin:
+                      const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
                   child: ListTile(
                     title: Text(
                       state.notifications[index - 1],
@@ -70,7 +69,8 @@ class _NotificationWidgetState extends State<NotificationWidget> {
                     trailing: IconButton(
                       icon: const Icon(Icons.delete, color: Colors.white),
                       onPressed: () {
-                        _notificationBloc.add(RemoveNotification(index: index - 1));
+                        _notificationBloc
+                            .add(RemoveNotification(index: index - 1));
                       },
                     ),
                   ),
@@ -83,11 +83,13 @@ class _NotificationWidgetState extends State<NotificationWidget> {
                   const alphabet = 'abcdefghijklmnopqrstuvwxyz';
                   final random = Random();
                   final length = 20;
-                  return List.generate(length, (index) => alphabet[random.nextInt(alphabet.length)]).join();
+                  return List.generate(length,
+                          (index) => alphabet[random.nextInt(alphabet.length)])
+                      .join();
                 }
 
-                _notificationBloc.add(AddNotification(notification: generateRandomString()));
-
+                _notificationBloc
+                    .add(AddNotification(notification: generateRandomString()));
               },
               child: const Icon(Icons.add),
             ),

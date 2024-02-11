@@ -27,7 +27,7 @@ public class RESTV2Controller {
 
 
     @GetMapping(PREFIX + "/user/{id}")
-    public ResponseEntity<?> getUser(@RequestParam final Integer id) {
+    public ResponseEntity<?> getUser(@PathVariable final Integer id) {
         final var userDAO = new UserDAO(props);
         final var user = userDAO.fetchById(id);
 

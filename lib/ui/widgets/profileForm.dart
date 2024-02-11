@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:geopoint/geopoint.dart';
 
 import '../../blocs/authentication/authentication_bloc.dart';
 import '../../blocs/authentication/authentication_event.dart';
@@ -32,7 +31,7 @@ class _ProfileFormState extends State<ProfileForm> {
 
   String? gender, interestedIn;
   DateTime? age;
-  GeoPoint? location;
+  Position? position;
   ProfileBloc? _profileBloc;
   Uint8List? fileBytes;
 
@@ -47,11 +46,8 @@ class _ProfileFormState extends State<ProfileForm> {
   }
 
   _getLocation() async {
-    Position position = await Geolocator.getCurrentPosition(
+    position = await Geolocator.getCurrentPosition(
         desiredAccuracy: LocationAccuracy.high);
-
-    location =
-        GeoPoint(latitude: position.latitude, longitude: position.longitude);
   }
 
   _onSubmitted() async {
@@ -60,7 +56,7 @@ class _ProfileFormState extends State<ProfileForm> {
       Submitted(
         name: _nameController.text,
         age: age!,
-        location: location!,
+        position: position!,
         gender: gender!,
         photo: fileBytes!,
       ),

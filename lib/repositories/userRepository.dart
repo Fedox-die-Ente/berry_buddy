@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'dart:typed_data';
 
-import 'package:geopoint/geopoint.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -101,7 +101,7 @@ class UserRepository {
       String gender,
       String interestedIn,
       DateTime age,
-      GeoPoint location) async {
+      Position position) async {
     print("ja");
     // TODO: Store in database
   }

@@ -1,25 +1,24 @@
 import 'dart:async';
-import 'package:bloc/bloc.dart';
+
 import 'package:berry_buddy/repositories/userRepository.dart';
+import 'package:bloc/bloc.dart';
+
 import './bloc.dart';
 
 class AuthenticationBloc
     extends Bloc<AuthenticationEvent, AuthenticationState> {
   final UserRepository _userRepository;
 
-  //
   AuthenticationBloc({required UserRepository userRepository})
       : _userRepository = userRepository,
         super(Uninitialized());
 
-
-  @override
   AuthenticationState get initialState => Uninitialized();
 
   @override
   Stream<AuthenticationState> mapEventToState(
-      AuthenticationEvent event,
-      ) async* {
+    AuthenticationEvent event,
+  ) async* {
     if (event is AppStarted) {
       yield* _mapAppStartedToState();
     } else if (event is LoggedIn) {
@@ -28,7 +27,6 @@ class AuthenticationBloc
       yield* _mapLoggedOutToState();
     }
   }
-
 
   Stream<AuthenticationState> _mapAppStartedToState() async* {
     try {
@@ -51,8 +49,9 @@ class AuthenticationBloc
   }
 
   Stream<AuthenticationState> _mapLoggedInToState() async* {
+    print(_userRepository.getUser());
     final isFirstTime =
-    await _userRepository.isFirstTime(await _userRepository.getUser());
+        await _userRepository.isFirstTime(await _userRepository.getUser());
 
     if (!isFirstTime) {
       yield AuthenticatedButNotSet(await _userRepository.getUser());

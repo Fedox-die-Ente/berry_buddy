@@ -1,7 +1,3 @@
-
-import 'dart:html';
-import 'dart:io';
-
 import 'package:berry_buddy/utils/icons.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
@@ -10,12 +6,12 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:geopoint/geopoint.dart';
 
-import '../blocs/authentication/authentication_bloc.dart';
-import '../blocs/authentication/authentication_event.dart';
-import '../blocs/profile/profile_bloc.dart';
-import '../blocs/profile/profile_event.dart';
-import '../blocs/profile/profile_state.dart';
-import '../repositories/userRepository.dart';
+import '../../blocs/authentication/authentication_bloc.dart';
+import '../../blocs/authentication/authentication_event.dart';
+import '../../blocs/profile/profile_bloc.dart';
+import '../../blocs/profile/profile_event.dart';
+import '../../blocs/profile/profile_state.dart';
+import '../../repositories/userRepository.dart';
 
 class ProfileForm extends StatefulWidget {
   final UserRepository _userRepository;
@@ -42,19 +38,20 @@ class _ProfileFormState extends State<ProfileForm> {
 
   bool get isFilled =>
       _nameController.text.isNotEmpty &&
-          gender != null &&
-          fileBytes != null &&
-          age != null;
+      gender != null &&
+      fileBytes != null &&
+      age != null;
 
   bool isButtonEnabled(ProfileState state) {
-
     return isFilled && !state.isSubmitting;
   }
 
   _getLocation() async {
-    Position position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
+    Position position = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high);
 
-    location = GeoPoint(latitude: position.latitude, longitude: position.longitude);
+    location =
+        GeoPoint(latitude: position.latitude, longitude: position.longitude);
   }
 
   _onSubmitted() async {
@@ -140,34 +137,34 @@ class _ProfileFormState extends State<ProfileForm> {
                           backgroundColor: Colors.transparent,
                           child: fileBytes == null
                               ? GestureDetector(
-                            onTap: () async {
-                              FilePickerResult? result = await FilePicker
-                                  .platform
-                                  .pickFiles(type: FileType.image);
-                              if (result != null) {
-                                setState(() {
-                                  fileBytes = result.files.first.bytes;
-                                });
-                              }
-                            },
-                            child: Image.asset('profilephoto.png'),
-                          )
+                                  onTap: () async {
+                                    FilePickerResult? result = await FilePicker
+                                        .platform
+                                        .pickFiles(type: FileType.image);
+                                    if (result != null) {
+                                      setState(() {
+                                        fileBytes = result.files.first.bytes;
+                                      });
+                                    }
+                                  },
+                                  child: Image.asset('profilephoto.png'),
+                                )
                               : GestureDetector(
-                            onTap: () async {
-                              FilePickerResult? result = await FilePicker
-                                  .platform
-                                  .pickFiles(type: FileType.image);
-                              if (result != null) {
-                                setState(() {
-                                  fileBytes = result.files.first.bytes;
-                                });
-                              }
-                            },
-                            child: CircleAvatar(
-                              radius: size.width * 0.15,
-                              backgroundImage: MemoryImage(fileBytes!),
-                            ),
-                          ),
+                                  onTap: () async {
+                                    FilePickerResult? result = await FilePicker
+                                        .platform
+                                        .pickFiles(type: FileType.image);
+                                    if (result != null) {
+                                      setState(() {
+                                        fileBytes = result.files.first.bytes;
+                                      });
+                                    }
+                                  },
+                                  child: CircleAvatar(
+                                    radius: size.width * 0.15,
+                                    backgroundImage: MemoryImage(fileBytes!),
+                                  ),
+                                ),
                         ),
                         SizedBox(height: 20),
                         textFieldWidget(_nameController, "Name", size),
@@ -216,7 +213,7 @@ class _ProfileFormState extends State<ProfileForm> {
                               ["Male", "Female", "Transgender", "Non-Binary"],
                               size,
                               gender,
-                                  (option) {
+                              (option) {
                                 setState(() {
                                   gender = option;
                                 });
@@ -288,11 +285,11 @@ Widget textFieldWidget(controller, text, size) {
 }
 
 Widget genderListWidget(
-    List<String> options,
-    Size size,
-    String? selectedOption,
-    Function onOptionSelected,
-    ) {
+  List<String> options,
+  Size size,
+  String? selectedOption,
+  Function onOptionSelected,
+) {
   return Row(
     mainAxisAlignment: MainAxisAlignment.spaceAround,
     children: options.map((option) {
@@ -300,14 +297,14 @@ Widget genderListWidget(
         option == "Female"
             ? Icons.female
             : option == "Male"
-            ? Icons.male
-            : option == "Non-Binary"
-            ? Berrybuddy_icons.non_binary
-            : Icons.transgender,
+                ? Icons.male
+                : option == "Non-Binary"
+                    ? Berrybuddy_icons.non_binary
+                    : Icons.transgender,
         option,
         size,
         selectedOption,
-            () {
+        () {
           onOptionSelected(option);
         },
       );
@@ -316,12 +313,12 @@ Widget genderListWidget(
 }
 
 Widget genderIconWidget(
-    IconData icon,
-    String label,
-    Size size,
-    String? selectedOption,
-    Function onTap,
-    ) {
+  IconData icon,
+  String label,
+  Size size,
+  String? selectedOption,
+  Function onTap,
+) {
   return GestureDetector(
     onTap: () {
       onTap();
@@ -331,7 +328,7 @@ Widget genderIconWidget(
         CircleAvatar(
           radius: size.width * 0.07,
           backgroundColor:
-          selectedOption == label ? Colors.deepPurple : Colors.transparent,
+              selectedOption == label ? Colors.deepPurple : Colors.transparent,
           child: Icon(
             icon,
             color: Colors.white,

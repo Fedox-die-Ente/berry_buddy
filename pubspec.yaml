@@ -56,6 +56,9 @@ dependencies:
   path_provider: ^2.1.2
   image_picker_web: ^3.1.1
   geopoint: ^1.0.0
+  elegant_notification: ^1.12.0
+  audioplayers: ^5.2.1
+  shared_preferences: ^2.2.2
 
 
 dev_dependencies:
@@ -82,6 +85,7 @@ flutter:
   assets:
     - assets/profilephoto.png
     - assets/non_binary.png
+    - assets/songs/banned.mp3
 
   fonts:
     - family: Berrybuddy_icons

@@ -5,6 +5,8 @@ const devTeam = "Fedustria Studios";
 const devTeamFounders = ["Fedox", "Austria"];
 const apiBaseUrl = "http://localhost:8080";
 
+const prefsSessionInfo = "sessionInfo";
+
 // Colors
 const kBackgroundColor = Color(0xff473450);
 const kTextFieldFill = Color(0xff1E1C24);

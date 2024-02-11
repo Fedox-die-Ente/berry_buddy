@@ -9,6 +9,7 @@ import de.fedustria.berrybuddy.api.rest.requests.SessionRequest;
 import de.fedustria.berrybuddy.api.rest.response.DefaultResponse;
 import de.fedustria.berrybuddy.api.rest.response.LoginResponse;
 import de.fedustria.berrybuddy.api.rest.response.SessionResponse;
+import de.fedustria.berrybuddy.api.service.CryptService;
 import de.fedustria.berrybuddy.api.service.UserService;
 import de.fedustria.berrybuddy.api.utils.IniProvider;
 import jakarta.servlet.http.HttpServletRequest;
@@ -26,16 +27,16 @@ import java.io.File;
 import java.util.Properties;
 import java.util.UUID;
 
-import static de.fedustria.berrybuddy.api.utils.Constants.CONF_DIR;
-import static de.fedustria.berrybuddy.api.utils.Constants.DB_INI;
+import static de.fedustria.berrybuddy.api.utils.Constants.*;
 import static de.fedustria.berrybuddy.api.utils.StringUtils.isEmpty;
 
 @RestController
 public class RESTV1Controller {
-    private static final Logger      LOG         = LoggerFactory.getLogger(RESTV1Controller.class);
-    private static final String      PREFIX      = "/api/v1";
-    private final        Properties  props       = new IniProvider(new File(CONF_DIR, DB_INI)).loadPropertiesNoEx();
-    private final        UserService userService = new UserService(new BCryptPasswordEncoder());
+    private static final Logger       LOG                 = LoggerFactory.getLogger(RESTV1Controller.class);
+    private static final String       PREFIX              = "/api/v1";
+    private final        Properties   props               = new IniProvider(new File(CONF_DIR, DB_INI)).loadPropertiesNoEx();
+    private final        UserService  userService         = new UserService(new BCryptPasswordEncoder());
+    private final        CryptService sessionCryptService = new CryptService(SESSION_SECRET);
 
     @PostMapping(PREFIX + "/login")
     public ResponseEntity<?> login(@RequestBody final LoginRequest body, final HttpServletResponse response, final HttpServletRequest request) {
@@ -46,7 +47,7 @@ public class RESTV1Controller {
 
             if (optUser.isPresent()) {
                 final var user = optUser.get();
-                final var sessionId = UUID.randomUUID().toString();
+                final var sessionId = sessionCryptService.encrypt(UUID.randomUUID().toString());
 
                 final Session session = new Session(user.getId(), sessionId, request.getRemoteAddr(), request.getHeader("User-Agent"));
                 final var sessionDAO = new SessionDAO(props);

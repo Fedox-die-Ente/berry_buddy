@@ -1,12 +1,12 @@
 import 'package:bloc/bloc.dart';
-import '../../repositories/userRepository.dart';
+
 import 'bloc.dart';
 
 class NotificationBloc extends Bloc<NotificationEvent, NotificationState> {
-  UserRepository _userRepository;
+  final String _userId;
 
-  NotificationBloc({required UserRepository userRepository})
-      : _userRepository = userRepository,
+  NotificationBloc({required String userId})
+      : _userId = userId,
         super(NotificationState.initial());
 
   @override
@@ -23,14 +23,16 @@ class NotificationBloc extends Bloc<NotificationEvent, NotificationState> {
   // Aber ja notifications sollten funktionieren, NUR, idk ob das jz auf user angepasst ist bzw es muss auch noch gespeichert werden i guess
   // local oder in der datenbank idk, das is dein job xd ich mach frontend
 
-  Stream<NotificationState> _mapAddNotificationToState(AddNotification event) async* {
+  Stream<NotificationState> _mapAddNotificationToState(
+      AddNotification event) async* {
     final List<String> updatedNotifications = List.from(state.notifications)
       ..add(event.notification);
 
     yield state.copyWith(notifications: updatedNotifications);
   }
 
-  Stream<NotificationState> _mapRemoveNotificationToState(RemoveNotification event) async* {
+  Stream<NotificationState> _mapRemoveNotificationToState(
+      RemoveNotification event) async* {
     final List<String> updatedNotifications = List.from(state.notifications);
 
     if (event.index >= 0 && event.index < updatedNotifications.length) {
@@ -39,7 +41,8 @@ class NotificationBloc extends Bloc<NotificationEvent, NotificationState> {
     }
   }
 
-  Stream<NotificationState> _mapClearNotificationsToState(ClearNotifications event) async* {
+  Stream<NotificationState> _mapClearNotificationsToState(
+      ClearNotifications event) async* {
     yield state.copyWith(notifications: []);
   }
 }

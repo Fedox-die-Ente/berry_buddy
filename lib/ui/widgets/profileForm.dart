@@ -1,7 +1,7 @@
-import 'package:berry_buddy/utils/icons.dart';
+import 'dart:typed_data';
+
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:geolocator/geolocator.dart';
 
@@ -11,6 +11,7 @@ import '../../blocs/profile/profile_bloc.dart';
 import '../../blocs/profile/profile_event.dart';
 import '../../blocs/profile/profile_state.dart';
 import '../../repositories/userRepository.dart';
+import '../../utils/icons.dart';
 
 class ProfileForm extends StatefulWidget {
   final UserRepository _userRepository;
@@ -25,9 +26,7 @@ class ProfileForm extends StatefulWidget {
 
 class _ProfileFormState extends State<ProfileForm> {
   final TextEditingController _nameController = TextEditingController();
-
-  DateTime? selectedDate;
-  final TextEditingController birthdateController = TextEditingController();
+  final TextEditingController _birthdateController = TextEditingController();
 
   String? gender, interestedIn;
   DateTime? age;
@@ -120,91 +119,74 @@ class _ProfileFormState extends State<ProfileForm> {
                   padding: EdgeInsets.all(20),
                   decoration: BoxDecoration(
                     color: Colors.black.withOpacity(0.5),
-                    // Dunkle Farbe für das Vordergrund-Panel
                     borderRadius: BorderRadius.circular(15),
                   ),
                   child: SingleChildScrollView(
-                    // Füge einen SingleChildScrollView hinzu, um den RenderFlex-Fehler zu beheben
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: <Widget>[
                         CircleAvatar(
                           radius: size.width * 0.15,
                           backgroundColor: Colors.transparent,
-                          child: fileBytes == null
-                              ? GestureDetector(
-                                  onTap: () async {
-                                    FilePickerResult? result = await FilePicker
-                                        .platform
-                                        .pickFiles(type: FileType.image);
-                                    if (result != null) {
-                                      setState(() {
-                                        fileBytes = result.files.first.bytes;
-                                      });
-                                    }
-                                  },
-                                  child: Image.asset('profilephoto.png'),
-                                )
-                              : GestureDetector(
-                                  onTap: () async {
-                                    FilePickerResult? result = await FilePicker
-                                        .platform
-                                        .pickFiles(type: FileType.image);
-                                    if (result != null) {
-                                      setState(() {
-                                        fileBytes = result.files.first.bytes;
-                                      });
-                                    }
-                                  },
-                                  child: CircleAvatar(
+                          child: GestureDetector(
+                            onTap: () async {
+                              FilePickerResult? result = await FilePicker
+                                  .platform
+                                  .pickFiles(type: FileType.image);
+                              if (result != null) {
+                                setState(() {
+                                  fileBytes = result.files.first.bytes;
+                                });
+                              }
+                            },
+                            child: fileBytes == null
+                                ? Image.asset('profilephoto.png')
+                                : CircleAvatar(
                                     radius: size.width * 0.15,
                                     backgroundImage: MemoryImage(fileBytes!),
                                   ),
-                                ),
+                          ),
                         ),
-                        SizedBox(height: 20),
-                        textFieldWidget(_nameController, "Name", size),
+                        const SizedBox(height: 10),
+                        ProfileImagePanel(),
+                        const SizedBox(height: 20),
+                        textFieldWidget(
+                          _nameController,
+                          "Name",
+                          size,
+                          Icons.person,
+                        ),
+                        const SizedBox(height: 20),
                         GestureDetector(
-                          child: TextField(
-                            controller: birthdateController,
-                            onTap: () async {
-                              DateTime currentDate = DateTime.now();
-                              DateTime? pickedDate = await showDatePicker(
-                                context: context,
-                                initialDate: currentDate,
-                                firstDate: DateTime(1900),
-                                lastDate: currentDate,
-                              );
+                          onTap: () async {
+                            DateTime currentDate = DateTime.now();
+                            DateTime? pickedDate = await showDatePicker(
+                              context: context,
+                              initialDate: currentDate,
+                              firstDate: DateTime(1900),
+                              lastDate: currentDate,
+                            );
 
-                              if (pickedDate != null &&
-                                  pickedDate != currentDate) {
-                                birthdateController.text = pickedDate
-                                    .toLocal()
-                                    .toString()
-                                    .split(' ')[0];
-                                age = pickedDate;
-                              }
-                            },
-                            style: const TextStyle(color: Colors.white),
-                            decoration: const InputDecoration(
-                              hintText: "Birthdate",
-                              hintStyle: TextStyle(color: Colors.grey),
-                              border: InputBorder.none,
+                            if (pickedDate != null &&
+                                pickedDate != currentDate) {
+                              _birthdateController.text =
+                                  pickedDate.toLocal().toString().split(' ')[0];
+                              age = pickedDate;
+                            }
+                          },
+                          child: AbsorbPointer(
+                            child: textFieldWidget(
+                              _birthdateController,
+                              "Birthdate",
+                              size,
+                              Icons.calendar_today,
                             ),
                           ),
                         ),
-                        const SizedBox(height: 20),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: <Widget>[
-                            Text(
-                              "You Are",
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: size.width * 0.07,
-                              ),
-                            ),
-                            const SizedBox(height: 10),
+                        SizedBox(height: 20),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceAround,
+                          children: [
                             genderListWidget(
                               ["Male", "Female", "Transgender", "Non-Binary"],
                               size,
@@ -217,32 +199,26 @@ class _ProfileFormState extends State<ProfileForm> {
                             ),
                           ],
                         ),
-                        const SizedBox(height: 20),
-                        GestureDetector(
-                          onTap: () {
-                            if (isButtonEnabled(state)) {
-                              _onSubmitted();
-                            } else {}
-                          },
-                          child: Container(
-                            width: size.width * 0.6,
-                            height: size.height * 0.06,
-                            decoration: BoxDecoration(
-                              color: isButtonEnabled(state)
-                                  ? Colors.deepPurple
-                                  : Colors.grey,
-                              borderRadius: BorderRadius.circular(30),
+                        SizedBox(height: 20),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceAround,
+                          children: [
+                            ElevatedButton(
+                              onPressed: () {
+                                _nameController.clear();
+                                _birthdateController.clear();
+                                setState(() {
+                                  gender = null;
+                                  fileBytes = null;
+                                });
+                              },
+                              child: Text("Clear"),
                             ),
-                            child: Center(
-                              child: Text(
-                                "Save",
-                                style: TextStyle(
-                                  fontSize: size.height * 0.025,
-                                  color: Colors.white,
-                                ),
-                              ),
+                            ElevatedButton(
+                              onPressed: isFilled ? () {} : null,
+                              child: Text("Save"),
                             ),
-                          ),
+                          ],
                         ),
                       ],
                     ),
@@ -257,17 +233,26 @@ class _ProfileFormState extends State<ProfileForm> {
   }
 }
 
-Widget textFieldWidget(controller, text, size) {
+Widget textFieldWidget(
+  TextEditingController controller,
+  String labelText,
+  Size size,
+  IconData icon,
+) {
   return Padding(
     padding: EdgeInsets.all(size.height * 0.02),
     child: TextField(
       controller: controller,
       style: const TextStyle(color: Colors.white),
       decoration: InputDecoration(
-        labelText: text,
+        labelText: labelText,
         labelStyle: TextStyle(
           color: Colors.white,
           fontSize: size.height * 0.03,
+        ),
+        prefixIcon: Icon(
+          icon,
+          color: Colors.white,
         ),
         focusedBorder: const OutlineInputBorder(
           borderSide: BorderSide(color: Colors.white, width: 1.0),
@@ -334,4 +319,52 @@ Widget genderIconWidget(
       ],
     ),
   );
+}
+
+class ProfileImagePanel extends StatefulWidget {
+  @override
+  _ProfileImagePanelState createState() => _ProfileImagePanelState();
+}
+
+class _ProfileImagePanelState extends State<ProfileImagePanel> {
+  List<Uint8List?> profileImages = List.filled(5, null);
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: Row(
+            children: List.generate(
+              profileImages.length,
+              (index) => Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: GestureDetector(
+                  onTap: () async {
+                    FilePickerResult? result = await FilePicker.platform
+                        .pickFiles(type: FileType.image);
+                    if (result != null) {
+                      setState(() {
+                        profileImages[index] = result.files.first.bytes;
+                      });
+                    }
+                  },
+                  child: CircleAvatar(
+                    radius: 40,
+                    backgroundImage: profileImages[index] != null
+                        ? MemoryImage(profileImages[index]!)
+                        : null,
+                    child: profileImages[index] == null
+                        ? const Icon(Icons.add)
+                        : null,
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
 }

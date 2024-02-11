@@ -94,15 +94,11 @@ class UserRepository {
   }
 
   // Profile Setup
-  Future<void> profileSetup(
-      Uint8List photo,
-      String userId,
-      String name,
-      String gender,
-      String interestedIn,
-      DateTime age,
-      Position position) async {
+  Future<bool> profileSetup(Uint8List photo, String userId, String name,
+      String gender, DateTime age, Position position) async {
     print("ja");
     // TODO: Store in database
+
+    return false;
   }
 }

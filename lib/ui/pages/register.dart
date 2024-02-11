@@ -1,10 +1,9 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../blocs/signup/signup_bloc.dart';
 import '../../repositories/userRepository.dart';
-import '../../widgets/register/RegisterForm.dart';
+import '../widgets/register/RegisterForm.dart';
 
 class SignUp extends StatelessWidget {
   final UserRepository _userRepository;

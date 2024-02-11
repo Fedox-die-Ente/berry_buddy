@@ -2,6 +2,8 @@ import 'package:berry_buddy/blocs/authentication/authentication_bloc.dart';
 import 'package:berry_buddy/blocs/authentication/authentication_event.dart';
 import 'package:berry_buddy/blocs/signup/bloc.dart';
 import 'package:berry_buddy/repositories/userRepository.dart';
+import 'package:elegant_notification/elegant_notification.dart';
+import 'package:elegant_notification/resources/arrays.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -21,7 +23,7 @@ class _RegisterFormState extends State<SignUpForm> {
   final TextEditingController _passwordController = TextEditingController();
 
   DateTime? selectedDate;
-  final TextEditingController birthdateController = TextEditingController();
+  final TextEditingController _birthdateController = TextEditingController();
 
   bool get isPopulated =>
       _emailController.text.isNotEmpty && _passwordController.text.isNotEmpty;
@@ -61,18 +63,44 @@ class _RegisterFormState extends State<SignUpForm> {
     super.initState();
   }
 
+  bool isUnderTwelveYearsOld(DateTime birthDate) {
+    DateTime now = DateTime.now();
+
+    int age = now.year - birthDate.year;
+    if (now.month < birthDate.month ||
+        (now.month == birthDate.month && now.day < birthDate.day)) {
+      age--;
+    }
+
+    return age < 13;
+  }
+
   void _onFormSubmitted() {
-    print("asgakjasaikga");
-    _signUpBloc?.add(
-      SignUpWithCredentialsPressed(
-          email: _emailController.text, password: _passwordController.text),
-    );
+    DateTime birthDate = DateTime.parse(_birthdateController.text);
+
+    if (isUnderTwelveYearsOld(birthDate)) {
+      ElegantNotification.error(
+              title: const Text("Error"),
+              displayCloseButton: false,
+              position: Alignment.topLeft,
+              animation: AnimationType.fromLeft,
+              description: const Text("You're not allowed, to use this app."))
+          .show(context);
+    } else {
+      _signUpBloc?.add(
+        SignUpWithCredentialsPressed(
+            email: _emailController.text, password: _passwordController.text),
+      );
+    }
+    //
+    // _signUpBloc?.add(
+    //   SignUpWithCredentialsPressed(
+    //       email: _emailController.text, password: _passwordController.text),
+    // );
   }
 
   // Register({required UserRepository userRepository})
   //     : _userRepository = userRepository;
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -81,44 +109,42 @@ class _RegisterFormState extends State<SignUpForm> {
         listener: (BuildContext context, SignUpState state) {
           if (state.isFailure) {
             Scaffold.of(context);
-            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                  content: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: <Widget>[
-                      Text("Sign Up failed"),
-                      Icon(Icons.error),
-                    ],
-                  ),
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: <Widget>[
+                    Text("Sign Up failed"),
+                    Icon(Icons.error),
+                  ],
                 ),
-              );
+              ),
+            );
           }
           if (state.isSubmitting) {
             print("isSubmitting");
             Scaffold.of(context);
 
-                ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: <Widget>[
-                      Text("Signing up..."),
-                      CircularProgressIndicator(),
-                    ],
-                  ),
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: <Widget>[
+                    Text("Signing up..."),
+                    CircularProgressIndicator(),
+                  ],
                 ),
-              );
+              ),
+            );
           }
           if (state.isSuccess) {
             print("Success");
+            ScaffoldMessenger.of(context).hideCurrentSnackBar();
             BlocProvider.of<AuthenticationBloc>(context).add(LoggedIn());
             Navigator.of(context).pop();
           }
         },
-
-
         child: BlocBuilder<SignUpBloc, SignUpState>(
-
-
           builder: (context, state) {
             // Use the state to build your UI
             return Container(
@@ -136,15 +162,23 @@ class _RegisterFormState extends State<SignUpForm> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
-                  const SizedBox(height: 80,),
+                  const SizedBox(
+                    height: 80,
+                  ),
                   Padding(
                     padding: const EdgeInsets.all(20),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: <Widget>[
-                        Text("Register", style: GoogleFonts.redHatDisplay(color: Colors.white, fontSize: 40, fontWeight: FontWeight.bold)),
+                        Text("Register",
+                            style: GoogleFonts.redHatDisplay(
+                                color: Colors.white,
+                                fontSize: 40,
+                                fontWeight: FontWeight.bold)),
                         const SizedBox(height: 10),
-                        Text("Thanks for choosing BerryBuddy.", style: GoogleFonts.redHatDisplay(color: Colors.white, fontSize: 18)),
+                        Text("Thanks for choosing BerryBuddy.",
+                            style: GoogleFonts.redHatDisplay(
+                                color: Colors.white, fontSize: 18)),
                       ],
                     ),
                   ),
@@ -153,74 +187,85 @@ class _RegisterFormState extends State<SignUpForm> {
                     child: Container(
                       decoration: const BoxDecoration(
                           color: Colors.black54,
-                          borderRadius: BorderRadius.only(topLeft: Radius.circular(60), topRight: Radius.circular(60))
-                      ),
+                          borderRadius: BorderRadius.only(
+                              topLeft: Radius.circular(60),
+                              topRight: Radius.circular(60))),
                       child: Padding(
                         padding: const EdgeInsets.all(30),
                         child: Column(
                           children: <Widget>[
-                            const SizedBox(height: 60,),
+                            const SizedBox(
+                              height: 60,
+                            ),
                             Container(
                               decoration: BoxDecoration(
                                   color: Colors.white,
                                   borderRadius: BorderRadius.circular(10),
-                                  boxShadow: const [BoxShadow(
-                                      color: Color.fromRGBO(60, 21, 117, .3),
-                                      blurRadius: 20,
-                                      offset: Offset(0, 10)
-                                  )]
-                              ),
+                                  boxShadow: const [
+                                    BoxShadow(
+                                        color: Color.fromRGBO(60, 21, 117, .3),
+                                        blurRadius: 20,
+                                        offset: Offset(0, 10))
+                                  ]),
                               child: Column(
                                 children: <Widget>[
                                   Container(
                                     padding: const EdgeInsets.all(10),
                                     decoration: BoxDecoration(
-                                        border: Border(bottom: BorderSide(color: Colors.deepPurpleAccent.shade200))
-                                    ),
+                                        border: Border(
+                                            bottom: BorderSide(
+                                                color: Colors.deepPurpleAccent
+                                                    .shade200))),
                                     child: TextFormField(
                                       controller: _emailController,
                                       validator: (_) {
-                                        return !state.isEmailValid ? "Invalid email" : null;
+                                        return !state.isEmailValid
+                                            ? "Invalid email"
+                                            : null;
                                       },
                                       decoration: const InputDecoration(
                                           hintText: "Email or phone number",
-                                          hintStyle: TextStyle(color: Colors.grey),
-                                          border: InputBorder.none
-                                      ),
+                                          hintStyle:
+                                              TextStyle(color: Colors.grey),
+                                          border: InputBorder.none),
                                     ),
                                   ),
-
                                   Container(
                                     padding: const EdgeInsets.all(10),
                                     decoration: const BoxDecoration(
-                                      //border: Border(bottom: BorderSide(color: Colors.grey.shade200))
-                                    ),
+                                        //border: Border(bottom: BorderSide(color: Colors.grey.shade200))
+                                        ),
                                     child: TextFormField(
                                       controller: _passwordController,
                                       autocorrect: false,
                                       obscureText: true,
                                       validator: (_) {
                                         return !state.isPasswordValid
-                                            ? "Invalid password." : null;
+                                            ? "Invalid password."
+                                            : null;
                                       },
                                       decoration: const InputDecoration(
                                           hintText: "Password",
-                                          hintStyle: TextStyle(color: Colors.grey),
-                                          border: InputBorder.none
-                                      ),
+                                          hintStyle:
+                                              TextStyle(color: Colors.grey),
+                                          border: InputBorder.none),
                                     ),
                                   ),
                                 ],
                               ),
                             ),
-                            const SizedBox(height: 40,),
+                            const SizedBox(
+                              height: 40,
+                            ),
                             Container(
                               padding: const EdgeInsets.all(10),
                               decoration: const BoxDecoration(
-                                border: Border(bottom: BorderSide(color: Colors.deepPurpleAccent)),
+                                border: Border(
+                                    bottom: BorderSide(
+                                        color: Colors.deepPurpleAccent)),
                               ),
                               child: TextField(
-                                controller: birthdateController,
+                                controller: _birthdateController,
                                 onTap: () async {
                                   DateTime currentDate = DateTime.now();
                                   DateTime? pickedDate = await showDatePicker(
@@ -230,8 +275,12 @@ class _RegisterFormState extends State<SignUpForm> {
                                     lastDate: currentDate,
                                   );
 
-                                  if (pickedDate != null && pickedDate != currentDate) {
-                                    birthdateController.text = pickedDate.toLocal().toString().split(' ')[0];
+                                  if (pickedDate != null &&
+                                      pickedDate != currentDate) {
+                                    _birthdateController.text = pickedDate
+                                        .toLocal()
+                                        .toString()
+                                        .split(' ')[0];
                                     selectedDate = pickedDate;
                                   }
                                 },
@@ -243,13 +292,15 @@ class _RegisterFormState extends State<SignUpForm> {
                                 ),
                               ),
                             ),
-                            const SizedBox(height: 40,),
+                            const SizedBox(
+                              height: 40,
+                            ),
                             MaterialButton(
-                                onPressed: () {
-                                  isSignUpButtonEnabled(state)
-                                      ? _onFormSubmitted()
-                                      : null;
-                                },
+                              onPressed: () {
+                                isSignUpButtonEnabled(state)
+                                    ? _onFormSubmitted()
+                                    : null;
+                              },
                               // onPressed: () {
                               //   String email = _emailController.text.trim();
                               //   String password = _passwordController.text.trim();
@@ -311,20 +362,30 @@ class _RegisterFormState extends State<SignUpForm> {
                               // },
                               height: 50,
                               //color: Colors.purple[900],
-                              color: isSignUpButtonEnabled(state) ? Colors.purple[900] : Colors.grey,
+                              color: isSignUpButtonEnabled(state)
+                                  ? Colors.purple[900]
+                                  : Colors.grey,
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(50),
                               ),
                               child: Center(
-                                child: Text("Register", style: GoogleFonts.redHatDisplay(color: Colors.white, fontWeight: FontWeight.bold)),
+                                child: Text("Register",
+                                    style: GoogleFonts.redHatDisplay(
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.bold)),
                               ),
                             ),
-                            const SizedBox(height: 40,),
+                            const SizedBox(
+                              height: 40,
+                            ),
                             InkWell(
                               onTap: () {
                                 // TODO: Redirect to login
                               },
-                              child: Text("Already have one? Log in here.", style: GoogleFonts.redHatDisplay(color: Colors.white, fontWeight: FontWeight.bold)),
+                              child: Text("Already have one? Log in here.",
+                                  style: GoogleFonts.redHatDisplay(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.bold)),
                             )
                           ],
                         ),
@@ -339,7 +400,4 @@ class _RegisterFormState extends State<SignUpForm> {
       ),
     );
   }
-
 }
-
-

@@ -7,7 +7,6 @@ import de.fedustria.berrybuddy.api.rest.requests.UserListRequest;
 import de.fedustria.berrybuddy.api.rest.response.DefaultResponse;
 import de.fedustria.berrybuddy.api.rest.response.UsersResponse;
 import de.fedustria.berrybuddy.api.utils.IniProvider;
-import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -71,7 +70,9 @@ public class RESTV2Controller {
     }
 
     @PostMapping(PREFIX + "/updateProfile")
-    public void updateProfile(@RequestBody final UpdateProfileRequest requestBody, final HttpServletRequest request) {
+    public void updateProfile(@RequestBody final UpdateProfileRequest requestBody) {
+        System.out.println(requestBody.getSessionId());
+        System.out.println(requestBody.getUserId());
         System.out.println(requestBody.getName());
         System.out.println(requestBody.getGender());
         System.out.println(requestBody.getAge());

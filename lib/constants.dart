@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 // Vars
 const devTeam = "Fedustria Studios";
 const devTeamFounders = ["Fedox", "Austria"];
+const apiBaseUrl = "http://localhost:8080";
 
 // Colors
 const kBackgroundColor = Color(0xff473450);

@@ -2,7 +2,7 @@ import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:equatable/equatable.dart';
-import 'package:geopoint/geopoint.dart';
+import 'package:geolocator/geolocator.dart';
 
 abstract class ProfileEvent extends Equatable {
   const ProfileEvent();
@@ -57,27 +57,27 @@ class InterestedInChanged extends ProfileEvent {
 }
 
 class LocationChanged extends ProfileEvent {
-  final GeoPoint location;
+  final Position position;
 
-  const LocationChanged({required this.location});
+  const LocationChanged({required this.position});
 
   @override
-  List<Object> get props => [location];
+  List<Object> get props => [position];
 }
 
 class Submitted extends ProfileEvent {
   final String name, gender;
   final DateTime age;
-  final GeoPoint location;
+  final Position position;
   final Uint8List photo;
 
   const Submitted(
       {required this.name,
-        required this.gender,
-        required this.age,
-        required this.location,
-        required this.photo});
+      required this.gender,
+      required this.age,
+      required this.position,
+      required this.photo});
 
   @override
-  List<Object> get props => [location, name, age, gender, photo];
+  List<Object> get props => [position, name, age, gender, photo];
 }

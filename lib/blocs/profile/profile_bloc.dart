@@ -1,10 +1,10 @@
 import 'dart:async';
 import 'dart:io';
 import 'dart:typed_data';
-import 'package:bloc/bloc.dart';
-import 'package:geopoint/geopoint.dart';
 
-import 'package:meta/meta.dart';
+import 'package:bloc/bloc.dart';
+import 'package:geolocator/geolocator.dart';
+
 import '../../repositories/userRepository.dart';
 import './bloc.dart';
 
@@ -14,7 +14,7 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
   ProfileBloc({required UserRepository userRepository})
       : assert(userRepository != null),
         _userRepository = userRepository,
-  super(ProfileState.empty());
+        super(ProfileState.empty());
 
   @override
   ProfileState get initialState => ProfileState.empty();
@@ -30,19 +30,19 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
     } else if (event is InterestedInChanged) {
       yield* _mapInterestedInChangedToState(event.interestedIn);
     } else if (event is LocationChanged) {
-      yield* _mapLocationChangedToState(event.location);
+      yield* _mapLocationChangedToState(event.position);
     } else if (event is PhotoChanged) {
       yield* _mapPhotoChangedToState(event.photo);
     } else if (event is Submitted) {
       final uid = await _userRepository.getUser();
       yield* _mapSubmittedToState(
-          photo: event.photo,
-          name: event.name,
-          gender: event.gender,
-          userId: uid,
-          age: event.age,
-          location: event.location,
-          );
+        photo: event.photo,
+        name: event.name,
+        gender: event.gender,
+        userId: uid,
+        age: event.age,
+        position: event.position,
+      );
     }
   }
 
@@ -77,26 +77,25 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
     );
   }
 
-  Stream<ProfileState> _mapLocationChangedToState(GeoPoint location) async* {
+  Stream<ProfileState> _mapLocationChangedToState(Position position) async* {
     yield state.update(
-      isLocationEmpty: location == null,
+      isLocationEmpty: position == null,
     );
   }
 
   Stream<ProfileState> _mapSubmittedToState(
       {Uint8List? photo,
-        String? gender,
-        String? name,
-        String? userId,
-        DateTime? age,
-        GeoPoint? location,
-        String? interestedIn}) async* {
+      String? gender,
+      String? name,
+      String? userId,
+      DateTime? age,
+      Position? position}) async* {
     yield ProfileState.loading();
-    try {
-      await _userRepository.profileSetup(
-          photo!, userId!, name!, gender!, interestedIn!, age!, location!);
+    bool success = await _userRepository.profileSetup(
+        photo!, userId!, name!, gender!, age!, position!);
+    if (success) {
       yield ProfileState.success();
-    } catch (_) {
+    } else {
       yield ProfileState.failure();
     }
   }

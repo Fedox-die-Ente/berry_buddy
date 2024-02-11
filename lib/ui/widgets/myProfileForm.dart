@@ -1,6 +1,10 @@
+import 'package:berry_buddy/ui/pages/firstprofile.dart';
+import 'package:berry_buddy/utils/icons.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '../../blocs/profile/profile_bloc.dart';
 import '../../repositories/userRepository.dart';
 
 class MyProfileForm extends StatefulWidget {
@@ -25,6 +29,7 @@ class _MyProfileState extends State<MyProfileForm> {
   TextEditingController _nameController = new TextEditingController();
   TextEditingController _ageController = new TextEditingController();
   TextEditingController _roleController = new TextEditingController();
+  TextEditingController _cityController = new TextEditingController();
 
   Map<String, dynamic>? userData;
   String? _name;
@@ -42,6 +47,7 @@ class _MyProfileState extends State<MyProfileForm> {
       _nameController.text = userData?["name"] ?? '';
       _ageController.text = userData?["birth_date"].toString() ?? '';
       _roleController.text = userData?["role"] ?? '';
+      _cityController.text = "Rostock";
     });
   }
 
@@ -93,6 +99,7 @@ class _MyProfileState extends State<MyProfileForm> {
       _buildTextPanel(Icons.emoji_people_rounded, _nameController),
       _buildTextPanel(Icons.numbers, _ageController),
       _buildTextPanel(Icons.group, _roleController),
+      _buildTextPanel(Berrybuddy_icons.mark_point, _cityController),
       SizedBox(height: 20),
       _buildEditProfileButton()
     ]);
@@ -144,15 +151,40 @@ class _MyProfileState extends State<MyProfileForm> {
       padding: const EdgeInsets.symmetric(horizontal: 20),
       child: ElevatedButton(
         onPressed: () {
-          // Hier den Bearbeitungsprozess einfügen
+          Navigator.push(
+            context,
+            PageRouteBuilder(
+              pageBuilder: (context, animation, secondaryAnimation) =>
+                  FadeTransition(
+                opacity: animation,
+                //  child: ProfileForm(userRepository: widget._userRepository),
+                child: Scaffold(
+                  body: BlocProvider<ProfileBloc>(
+                    create: (context) => ProfileBloc(
+                      userRepository: widget._userRepository,
+                    ),
+                    child: ProfileSetup(
+                      userId: widget._userId,
+                      userRepository: widget._userRepository,
+                    ),
+                  ),
+                ),
+              ),
+              transitionsBuilder:
+                  (context, animation, secondaryAnimation, child) {
+                const begin = Offset(0.0, 1.0);
+                const end = Offset.zero;
+                const curve = Curves.easeInOut;
+                var tween = Tween(begin: begin, end: end)
+                    .chain(CurveTween(curve: curve));
+
+                var offsetAnimation = animation.drive(tween);
+
+                return SlideTransition(position: offsetAnimation, child: child);
+              },
+            ),
+          );
         },
-        child: Padding(
-          padding: const EdgeInsets.all(12.0),
-          child: Text(
-            'Edit Profile',
-            style: TextStyle(fontSize: 18),
-          ),
-        ),
         style: ButtonStyle(
           shape: MaterialStateProperty.all<RoundedRectangleBorder>(
             RoundedRectangleBorder(
@@ -163,6 +195,13 @@ class _MyProfileState extends State<MyProfileForm> {
           foregroundColor: MaterialStateProperty.all<Color>(Colors.white),
           overlayColor:
               MaterialStateProperty.all<Color>(Colors.deepPurpleAccent),
+        ),
+        child: const Padding(
+          padding: const EdgeInsets.all(12.0),
+          child: Text(
+            'Edit Profile',
+            style: TextStyle(fontSize: 18),
+          ),
         ),
       ),
     );

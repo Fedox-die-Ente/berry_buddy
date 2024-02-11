@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:typed_data';
 
+import 'package:berry_buddy/constants.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
@@ -10,7 +11,7 @@ class UserRepository {
 
   Future<bool> signInWithEmail(String email, String password) async {
     http.Response response =
-        await http.post(Uri.parse('http://localhost:8080/api/v1/login'),
+        await http.post(Uri.parse('$apiBaseUrl/api/v1/login'),
             headers: {
               'Content-Type': 'application/json',
             },
@@ -36,7 +37,7 @@ class UserRepository {
 
   Future<Map<String, dynamic>?> getUserData(String userId) async {
     http.Response response =
-        await http.get(Uri.parse("http://localhost:8080/api/v2/user/$userId"));
+        await http.get(Uri.parse("$apiBaseUrl/api/v2/user/$userId"));
 
     if (response.statusCode == 200) {
       return json.decode(response.body);
@@ -48,7 +49,7 @@ class UserRepository {
     bool? exists;
 
     http.Response response =
-        await http.get(Uri.parse("http://localhost:8080/api/v2/user/$userId"));
+        await http.get(Uri.parse("$apiBaseUrl/api/v2/user/$userId"));
 
     exists = response.statusCode == 200;
 
@@ -57,7 +58,7 @@ class UserRepository {
 
   Future<bool> signUpWithEmail(String email, String password) async {
     http.Response response =
-        await http.post(Uri.parse('http://localhost:8080/api/v1/register'),
+        await http.post(Uri.parse('$apiBaseUrl/api/v1/register'),
             headers: {
               'Content-Type': 'application/json',
             },

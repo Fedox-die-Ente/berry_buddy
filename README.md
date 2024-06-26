@@ -1,3 +1,7 @@
+---
+# ⚠️ THIS PROJECT IS ARCHIVED, AND NOT FINISHED ⚠️
+---
+
 # Berry Buddy
 
 Welcome to Berry Buddy - Your Ultimate Friend-Making App!
